@@ -1,0 +1,12 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.strtol]
+kind = "library"
+
+[sdk_components.strtol.build]
+sources = [
+    "${sdk}/lib/strtol/strtol.cc",
+    "${sdk}/lib/strtol/strtoul.cc",
+]

@@ -1,0 +1,44 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "regress-thread-exit-irq"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.helper]
+kind = "compartment"
+
+[services.helper.build]
+sources = [
+    "helper.cc",
+]
+
+[services.top]
+kind = "compartment"
+
+[services.top.build]
+sources = [
+    "top.cc",
+]
+
+[[firmwares]]
+name = "top_compartment"
+libraries = [
+    "freestanding",
+    "debug",
+]
+services = [
+    "top",
+    "helper",
+]
+
+[[firmwares.threads]]
+name = "top"
+compartment = "top"
+entry = "entry"
+priority = 1
+stack_size = 512
+trusted_stack_frames = 1

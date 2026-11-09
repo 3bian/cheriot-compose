@@ -1,0 +1,120 @@
+build_lock={{{build_lock}}}
+intermediate_dir={{{build_dir}}}
+publication_lock=''
+guard_path() {
+    checked_path=$1
+    while :; do
+        if test -L "$checked_path"; then
+            printf 'Refusing symlink in output path: %s\n' "$checked_path" >&2
+            exit 1
+        fi
+        parent_path=$(dirname -- "$checked_path")
+        test "$parent_path" != "$checked_path" || break
+        checked_path=$parent_path
+    done
+}
+checksum() {
+    checksum_value=$(cksum < "$1")
+    set -- $checksum_value
+    test "$#" -eq 2 || return 1
+    printf '%s %s' "$1" "$2"
+}
+valid_checksum() {
+    set -- $1
+    test "$#" -eq 2 || return 1
+    case "$1" in ''|*[!0-9]*) return 1 ;; esac
+    case "$2" in ''|*[!0-9]*) return 1 ;; esac
+}
+matches_exact() (
+    expected_tmp=$(mktemp "$intermediate_dir/.expected.XXXXXX")
+    trap 'rm -f -- "$expected_tmp"' 0 1 2 3 15
+    printf '%s' "$2" > "$expected_tmp"
+    cmp -s -- "$1" "$expected_tmp"
+)
+guard_path "$build_lock"
+mkdir -p -- {{{build_dir}}}
+if ! mkdir -- "$build_lock" 2>/dev/null; then
+    printf 'Build directory is locked: %s\n' "$build_lock" >&2
+    exit 1
+fi
+cleanup_locks() {
+    if test -n "$publication_lock"; then rmdir -- "$publication_lock" 2>/dev/null || :; fi
+    rmdir -- "$build_lock" 2>/dev/null || :
+}
+trap cleanup_locks 0
+trap 'exit 1' 1 2 3 15
+{{#state_identity}}
+identity_path={{{identity_path}}}
+expected_build_owner={{{owner}}}
+guard_path "$identity_path"
+if test -e "$identity_path"; then
+    test -f "$identity_path" && matches_exact "$identity_path" "$expected_build_owner" || { printf 'Intermediate directory identity collision: %s\n' "$identity_path" >&2; exit 1; }
+else
+    (set -C; printf '%s' "$expected_build_owner" > "$identity_path") || { printf 'Cannot claim intermediate identity: %s\n' "$identity_path" >&2; exit 1; }
+fi
+{{/state_identity}}
+{{#owned_record}}
+owned_record_path={{{path}}}
+guard_path "$owned_record_path"
+if test -e "$owned_record_path"; then
+    test -f "$owned_record_path" && matches_exact "$owned_record_path" {{{content}}} || { printf 'Refusing unowned build record: %s\n' "$owned_record_path" >&2; exit 1; }
+fi
+{{/owned_record}}
+{{#publication}}
+final_dir={{{output_dir}}}
+final_elf={{{elf}}}
+final_report={{{report_path}}}
+owner_marker={{{marker}}}
+expected_owner={{{identity}}}
+report_enabled={{{report_enabled}}}
+publication_lock={{{lock_path}}}
+registry={{{registry}}}
+for path in "$final_dir" "$final_elf" "$final_report" "$owner_marker" "$publication_lock"; do guard_path "$path"; done
+mkdir -p -- "$final_dir"
+if ! mkdir -- "$publication_lock" 2>/dev/null; then
+    publication_lock=''
+    printf 'Final output is locked; wait for the other build.\n' >&2
+    exit 1
+fi
+guard_path "$registry"
+if test -e "$registry"; then
+    test -f "$registry" || { printf 'Invalid publication registry: %s\n' "$registry" >&2; exit 1; }
+    if ! matches_exact "$registry" {{{registry_enabled}}} && ! matches_exact "$registry" {{{registry_disabled}}}; then
+        printf 'Publication registry belongs to another destination: %s\n' "$registry" >&2; exit 1
+    fi
+fi
+verify_ownership() {
+    for path in "$final_dir" "$final_elf" "$final_report" "$owner_marker"; do guard_path "$path"; done
+    has_marker=false
+    old_report='-'
+    if test -e "$owner_marker"; then
+        test -f "$owner_marker" || { printf 'Invalid output ownership record: %s\n' "$owner_marker" >&2; exit 1; }
+        {
+            IFS= read -r marker_version || { printf 'Invalid output ownership record\n' >&2; exit 1; }
+            IFS= read -r marker_owner || { printf 'Invalid output ownership record\n' >&2; exit 1; }
+            IFS= read -r old_elf || { printf 'Invalid output ownership record\n' >&2; exit 1; }
+            IFS= read -r old_report || { printf 'Invalid output ownership record\n' >&2; exit 1; }
+            if IFS= read -r extra_line; then printf 'Invalid output ownership record\n' >&2; exit 1; fi
+        } < "$owner_marker"
+        test "$marker_version" = {{{marker_version}}} || { printf 'Invalid output ownership record\n' >&2; exit 1; }
+        valid_checksum "$old_elf" || { printf 'Invalid output ownership record\n' >&2; exit 1; }
+        if test "$old_report" != '-'; then valid_checksum "$old_report" || { printf 'Invalid output ownership record\n' >&2; exit 1; }; fi
+        test "$marker_owner" = "$expected_owner" || { printf 'Final output collision: %s belongs to another build\n' "$final_elf" >&2; exit 1; }
+        has_marker=true
+        if test -e "$final_elf"; then
+            test -f "$final_elf" && test "$(checksum "$final_elf")" = "$old_elf" || { printf 'Refusing modified firmware: %s\n' "$final_elf" >&2; exit 1; }
+        fi
+        if test "$old_report" != '-'; then
+            if test -e "$final_report"; then
+                test -f "$final_report" && test "$(checksum "$final_report")" = "$old_report" || { printf 'Refusing modified report: %s\n' "$final_report" >&2; exit 1; }
+            fi
+        elif "$report_enabled" && test -e "$final_report"; then
+            printf 'Refusing unowned report: %s\n' "$final_report" >&2; exit 1
+        fi
+    else
+        if test -e "$final_elf"; then printf 'Refusing unowned firmware: %s\n' "$final_elf" >&2; exit 1; fi
+        if "$report_enabled" && test -e "$final_report"; then printf 'Refusing unowned report: %s\n' "$final_report" >&2; exit 1; fi
+    fi
+}
+verify_ownership
+{{/publication}}

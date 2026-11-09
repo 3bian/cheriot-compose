@@ -1,0 +1,23 @@
+# Synthetic project for host tests; SDK files are copied into the test directory.
+name = "producer-consumer"
+board = "./boards/sail.toml"
+include = ["./sdk/cheriot-compose.toml"]
+mode = "release"
+sdk = "./sdk"
+
+[services.consumer]
+build = { sources = ["consumer.cc"] }
+kind = "compartment"
+
+[services.producer]
+build = { sources = ["producer.cc"] }
+kind = "compartment"
+
+[[firmwares]]
+name = "producer-consumer"
+libraries = ["freestanding", "message_queue", "debug"]
+services = ["producer", "consumer"]
+threads = [
+    { compartment = "producer", entry = "run", name = "producer-main", priority = 1, stack_size = 0x500, trusted_stack_frames = 5 },
+    { compartment = "consumer", entry = "run", name = "consumer-main", priority = 1, stack_size = 0x500, trusted_stack_frames = 3 },
+]

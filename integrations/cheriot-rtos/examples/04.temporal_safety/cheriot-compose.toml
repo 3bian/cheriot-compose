@@ -1,0 +1,48 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "temporal-safety"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.allocate]
+dependencies = [
+    "freestanding",
+    "debug",
+]
+kind = "compartment"
+
+[services.allocate.build]
+sources = [
+    "allocate.cc",
+]
+
+[services.claimant]
+dependencies = [
+    "debug",
+]
+kind = "compartment"
+
+[services.claimant.build]
+sources = [
+    "claimant.cc",
+]
+
+[[firmwares]]
+name = "temporal_safety"
+libraries = []
+services = [
+    "allocate",
+    "claimant",
+]
+
+[[firmwares.threads]]
+name = "allocate"
+compartment = "allocate"
+entry = "entry"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 4

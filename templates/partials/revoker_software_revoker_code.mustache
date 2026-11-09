@@ -1,0 +1,9 @@
+	software_revoker_code : CAPALIGN
+	{
+		.software_revoker_start = .;
+		.software_revoker_import_end = .;
+		software_revoker.compartment(.text .text.* .rodata .rodata.* .data.rel.ro);
+		*/cheriot.software_revoker--*.compartment(.text .text.* .rodata .rodata.* .data.rel.ro);
+	}
+	.software_revoker_end = .;
+

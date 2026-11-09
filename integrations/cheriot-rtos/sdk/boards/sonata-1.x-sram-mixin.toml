@@ -1,0 +1,8 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+patches = [
+    { op = "remove", path = "/data_memory" },
+    { op = "replace", path = "/instruction_memory/start", value = 1052672 },
+    { op = "replace", path = "/instruction_memory/end", value = 1179648 },
+]

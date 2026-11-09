@@ -1,0 +1,159 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sonata-1.1"
+cpu = "cheriot-ibex"
+defines = [
+    "IBEX",
+    "SONATA=10100",
+    "SUNBURST",
+    "ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM=1",
+    "ipconfigDRIVER_INCLUDED_TX_IP_CHECKSUM=1",
+    "STDERR_TO_STDOUT=1",
+]
+driver_includes = [
+    "${sdk}/include/platform/sunburst",
+    "${sdk}/include/platform/ibex",
+    "${sdk}/include/platform/generic-riscv",
+]
+interrupts = [
+    { edge_triggered = true, name = "RevokerInterrupt", number = 1, priority = 2 },
+    { name = "EthernetInterrupt", number = 2, priority = 3 },
+    { name = "UsbDevInterrupt", number = 3, priority = 3 },
+    { name = "Uart0Interrupt", number = 8, priority = 3 },
+    { name = "Uart1Interrupt", number = 9, priority = 3 },
+    { name = "Uart2Interrupt", number = 10, priority = 3 },
+    { name = "I2c0Interrupt", number = 16, priority = 3 },
+    { name = "I2c1Interrupt", number = 17, priority = 3 },
+    { name = "SpiLcdInterrupt", number = 24, priority = 3 },
+    { name = "SpiEthmacInterrupt", number = 25, priority = 3 },
+    { name = "Spi0Interrupt", number = 26, priority = 3 },
+    { name = "Spi1Interrupt", number = 27, priority = 3 },
+    { name = "Spi2Interrupt", number = 28, priority = 3 },
+]
+packaging = "sonata_v1"
+revokable_memory_start = 1048576
+revoker = "hardware"
+runner = { executable = "${sdk}/scripts/run-sonata-1.0.sh" }
+simulation = false
+tickrate_hz = 100
+timer_hz = 40000000
+
+[devices.shadow]
+end = 805308416
+start = 805306368
+
+[devices.gpio_board]
+end = 2147483676
+start = 2147483648
+
+[devices.gpio_rpi]
+end = 2147483740
+start = 2147483712
+
+[devices.gpio_arduino]
+end = 2147483804
+start = 2147483776
+
+[devices.gpio_pmod0]
+end = 2147483868
+start = 2147483840
+
+[devices.gpio_pmod1]
+end = 2147483932
+start = 2147483904
+
+[devices.gpio_pmodc]
+end = 2147483996
+start = 2147483968
+
+[devices.pwm]
+end = 2147487792
+start = 2147487744
+
+[devices.pwm_lcd]
+end = 2147487800
+start = 2147487792
+
+[devices.pinmux_pins_sinks]
+length = 85
+start = 2147504128
+
+[devices.pinmux_block_sinks]
+length = 70
+start = 2147506176
+
+[devices.rgbled]
+end = 2147520544
+start = 2147520512
+
+[devices.revoker]
+length = 4096
+start = 2147524608
+
+[devices.adc]
+length = 4096
+start = 2147528704
+
+[devices.clint]
+end = 2147811328
+start = 2147745792
+
+[devices.uart]
+end = 2148532276
+start = 2148532224
+
+[devices.uart1]
+end = 2148536372
+start = 2148536320
+
+[devices.uart2]
+end = 2148540468
+start = 2148540416
+
+[devices.i2c0]
+end = 2149580928
+start = 2149580800
+
+[devices.i2c1]
+end = 2149585024
+start = 2149584896
+
+[devices.spi_lcd]
+end = 2150633472
+start = 2150629376
+
+[devices.spi_ethmac]
+end = 2150637568
+start = 2150633472
+
+[devices.spi0]
+end = 2150641664
+start = 2150637568
+
+[devices.spi1]
+end = 2150645760
+start = 2150641664
+
+[devices.spi2]
+end = 2150649856
+start = 2150645760
+
+[devices.usbdev]
+end = 2151682048
+start = 2151677952
+
+[devices.plic]
+end = 2285895680
+start = 2281701376
+
+[data_memory]
+end = 1179648
+start = 1052672
+
+[instruction_memory]
+end = 1074790400
+start = 1073741824
+
+[heap]
+end = 1179648

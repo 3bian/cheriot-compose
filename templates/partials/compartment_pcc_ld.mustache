@@ -1,0 +1,11 @@
+
+	".{{{compartment}}}_code" : CAPALIGN
+	{
+		".{{{compartment}}}_code_start" = .;
+		"{{{obj}}}"(".compartment_import_table");
+		".{{{compartment}}}_imports_end" = .;
+		"{{{obj}}}"(.text);
+		"{{{obj}}}"(.init_array);
+		"{{{obj}}}"(.rodata);
+		. = ALIGN(8);
+	}

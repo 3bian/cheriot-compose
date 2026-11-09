@@ -1,0 +1,81 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sonata-0.2"
+cpu = "cheriot-ibex"
+defines = [
+    "IBEX",
+    "SONATA=200",
+    "SUNBURST",
+    "DEFAULT_UART_BAUD_RATE=115200",
+    "ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM=1",
+    "ipconfigDRIVER_INCLUDED_TX_IP_CHECKSUM=1",
+    "CHERIOT_NO_SAIL_83",
+]
+driver_includes = [
+    "${sdk}/include/platform/sunburst/v0.2",
+    "${sdk}/include/platform/sunburst",
+    "${sdk}/include/platform/generic-riscv",
+]
+interrupts = [
+    { edge_triggered = true, name = "UartRxWatermark", number = 2, priority = 3 },
+    { name = "EthernetInterrupt", number = 47, priority = 3 },
+]
+packaging = "sonata_legacy"
+revokable_memory_start = 1048576
+revoker = "software"
+runner = { executable = "${sdk}/scripts/run-sonata.sh" }
+simulation = false
+tickrate_hz = 100
+timer_hz = 30000000
+
+[devices.shadow]
+end = 805322752
+start = 805306368
+
+[devices.gpio]
+end = 2147483680
+start = 2147483648
+
+[devices.clint]
+end = 2147811328
+start = 2147745792
+
+[devices.uart]
+end = 2148532276
+start = 2148532224
+
+[devices.i2c0]
+end = 2149580928
+start = 2149580800
+
+[devices.i2c1]
+end = 2149585024
+start = 2149584896
+
+[devices.spi0]
+end = 2150633472
+start = 2150629376
+
+[devices.spi1]
+end = 2150637568
+start = 2150633472
+
+[devices.spi2]
+end = 2150641664
+start = 2150637568
+
+[devices.rgbled]
+end = 2147520544
+start = 2147520512
+
+[devices.plic]
+end = 2285895680
+start = 2281701376
+
+[instruction_memory]
+end = 1310720
+start = 1052672
+
+[heap]
+end = 1310720

@@ -1,0 +1,43 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "allocation-benchmark"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.allocbench]
+dependencies = [
+    "crt",
+    "freestanding",
+    "atomic",
+    "stdio",
+    "debug",
+]
+kind = "compartment"
+
+[services.allocbench.build]
+defines = [
+    "MALLOC_QUOTA=1000000",
+    "BOARD=${board}",
+    "DEBUG_ALLOCBENCH=${options.component_debug}",
+]
+sources = [
+    "alloc.cc",
+]
+
+[[firmwares]]
+name = "allocator-benchmark"
+services = [
+    "allocbench",
+]
+
+[[firmwares.threads]]
+name = "main"
+compartment = "allocbench"
+entry = "run"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 4

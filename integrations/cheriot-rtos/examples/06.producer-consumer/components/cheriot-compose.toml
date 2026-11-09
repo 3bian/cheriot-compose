@@ -1,0 +1,19 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[services.consumer]
+kind = "compartment"
+
+[services.consumer.build]
+sources = [
+    "../consumer.cc",
+]
+
+[services.producer]
+kind = "compartment"
+
+[services.producer.build]
+sources = [
+    "../producer.cc",
+]

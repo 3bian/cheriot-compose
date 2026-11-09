@@ -1,0 +1,67 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.atomic1]
+kind = "library"
+
+[sdk_components.atomic1.build]
+sources = [
+    "${sdk}/lib/atomic/atomic1.cc",
+]
+
+[sdk_components.atomic2]
+kind = "library"
+
+[sdk_components.atomic2.build]
+sources = [
+    "${sdk}/lib/atomic/atomic2.cc",
+]
+
+[sdk_components.atomic4]
+kind = "library"
+
+[sdk_components.atomic4.build]
+sources = [
+    "${sdk}/lib/atomic/atomic4.cc",
+]
+
+[sdk_components.atomic8]
+kind = "library"
+
+[sdk_components.atomic8.build]
+sources = [
+    "${sdk}/lib/atomic/atomic8.cc",
+]
+
+[sdk_components.atomiccap]
+kind = "library"
+
+[sdk_components.atomiccap.build]
+sources = [
+    "${sdk}/lib/atomic/atomiccap.cc",
+]
+
+[sdk_components.atomic_fixed]
+dependencies = [
+    "atomic1",
+    "atomic2",
+    "atomic4",
+    "atomic8",
+    "atomiccap",
+]
+kind = "group"
+
+[sdk_components.atomic_fixed.build]
+sources = []
+
+[sdk_components.atomic]
+dependencies = [
+    "atomic_fixed",
+]
+kind = "library"
+
+[sdk_components.atomic.build]
+sources = [
+    "${sdk}/lib/atomic/atomicn.cc",
+]

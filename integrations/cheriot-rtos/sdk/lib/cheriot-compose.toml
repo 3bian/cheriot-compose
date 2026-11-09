@@ -1,0 +1,25 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "atomic/cheriot-compose.toml",
+    "clock/cheriot-compose.toml",
+    "compartment_helpers/cheriot-compose.toml",
+    "crt/cheriot-compose.toml",
+    "cxxrt/cheriot-compose.toml",
+    "debug/cheriot-compose.toml",
+    "event_group/cheriot-compose.toml",
+    "freestanding/cheriot-compose.toml",
+    "locks/cheriot-compose.toml",
+    "microvium/cheriot-compose.toml",
+    "queue/cheriot-compose.toml",
+    "randombytes/cheriot-compose.toml",
+    "stdio/cheriot-compose.toml",
+    "string/cheriot-compose.toml",
+    "strtol/cheriot-compose.toml",
+    "thread_pool/cheriot-compose.toml",
+    "time/cheriot-compose.toml",
+    "unwind_error_handler/cheriot-compose.toml",
+    "softfloat/cheriot-compose.toml",
+    "math/cheriot-compose.toml",
+]

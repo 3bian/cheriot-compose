@@ -1,0 +1,63 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "audit"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.caesar]
+kind = "compartment"
+
+[services.caesar.build]
+sources = [
+    "caesar_cypher.cc",
+]
+
+[services.entry]
+kind = "compartment"
+
+[services.entry.build]
+sources = [
+    "entry.cc",
+]
+
+[services.producer]
+kind = "compartment"
+
+[services.producer.build]
+sources = [
+    "producer.cc",
+]
+
+[services.consumer]
+kind = "compartment"
+
+[services.consumer.build]
+sources = [
+    "consumer.cc",
+]
+
+[[firmwares]]
+name = "audit"
+libraries = [
+    "freestanding",
+    "debug",
+    "string",
+]
+services = [
+    "entry",
+    "caesar",
+    "producer",
+    "consumer",
+]
+
+[[firmwares.threads]]
+name = "entry"
+compartment = "entry"
+entry = "entry"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 3

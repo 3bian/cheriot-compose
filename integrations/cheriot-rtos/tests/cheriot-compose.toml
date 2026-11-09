@@ -1,0 +1,223 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "cheriot-test-suite"
+board = "sail"
+include = ["../sdk/cheriot-compose.toml"]
+sdk = "../sdk"
+
+[services.test_runner]
+build.sources = [
+    "test-runner.cc",
+    { path = "test-version.cc", rtos_git_description = true },
+]
+kind = "compartment"
+
+[services.ccompile_test]
+build.sources = ["ccompile-test.c"]
+dependencies = ["freertos-compile-semaphore-only", "freertos-compile-mutex-only", "freertos-compile-recursive-mutex-only", "freertos-compile-all-options"]
+kind = "compartment"
+
+[libraries.freertos-compile-semaphore-only]
+build = { defines = ["CHERIOT_CUSTOM_DEFAULT_MALLOC_CAPABILITY", "CHERIOT_EXPOSE_FREERTOS_SEMAPHORE"], sources = ["ccompile-freertos-test.c"] }
+kind = "object"
+
+[libraries.freertos-compile-mutex-only]
+build = { defines = ["CHERIOT_CUSTOM_DEFAULT_MALLOC_CAPABILITY", "CHERIOT_EXPOSE_FREERTOS_MUTEX"], sources = ["ccompile-freertos-test.c"] }
+kind = "object"
+
+[libraries.freertos-compile-recursive-mutex-only]
+build = { defines = ["CHERIOT_CUSTOM_DEFAULT_MALLOC_CAPABILITY", "CHERIOT_EXPOSE_FREERTOS_RECURSIVE_MUTEX"], sources = ["ccompile-freertos-test.c"] }
+kind = "object"
+
+[libraries.freertos-compile-all-options]
+build = { defines = ["CHERIOT_CUSTOM_DEFAULT_MALLOC_CAPABILITY", "CHERIOT_EXPOSE_FREERTOS_SEMAPHORE", "CHERIOT_EXPOSE_FREERTOS_MUTEX", "CHERIOT_EXPOSE_FREERTOS_RECURSIVE_MUTEX"], sources = ["ccompile-freertos-test.c"] }
+kind = "object"
+
+[libraries.extra_compiles_test]
+build.sources = []
+dependencies = ["atomic_fixed"]
+kind = "group"
+
+[libraries.preflight_test]
+build.sources = []
+kind = "group"
+
+[libraries.global_constructors_test]
+build.sources = []
+kind = "group"
+
+[services.debug_cxx_test]
+build.sources = ["debug_cxx-test.cc"]
+kind = "compartment"
+
+[services.debug_c_test]
+build.sources = ["debug_c-test.c"]
+kind = "compartment"
+
+[services.mmio_test]
+build.sources = ["mmio-test.cc"]
+kind = "compartment"
+
+[services.unwind_cleanup_test]
+build.sources = ["unwind_cleanup-test.cc"]
+dependencies = ["unwind_error_handler"]
+kind = "compartment"
+
+[services.softfloat_test]
+build.sources = ["softfloat-test.cc"]
+dependencies = ["softfloat"]
+kind = "compartment"
+
+[services.stdio_test]
+build.sources = ["stdio-test.cc"]
+dependencies = ["stdio"]
+kind = "compartment"
+
+[services.bigdata_test]
+build.sources = ["bigdata-test.cc"]
+kind = "compartment"
+
+[services.static_sealing_inner]
+build.sources = ["static_sealing_inner.cc"]
+kind = "compartment"
+
+[services.static_sealing_test]
+build.sources = ["static_sealing-test.cc"]
+dependencies = ["static_sealing_inner"]
+kind = "compartment"
+
+[services.crash_recovery_inner]
+build.sources = ["crash_recovery_inner.cc"]
+kind = "compartment"
+
+[services.crash_recovery_outer]
+build.sources = ["crash_recovery_outer.cc"]
+kind = "compartment"
+
+[services.crash_recovery_test]
+build.sources = ["crash_recovery-test.cc"]
+dependencies = ["crash_recovery_inner", "crash_recovery_outer"]
+kind = "compartment"
+
+[services.compartment_calls_inner]
+build.sources = ["compartment_calls_inner.cc"]
+kind = "compartment"
+
+[services.compartment_calls_test]
+build.sources = ["compartment_calls-test.cc"]
+dependencies = ["compartment_calls_inner"]
+kind = "compartment"
+
+[services.check_pointer_test]
+build.sources = ["check_pointer-test.cc"]
+kind = "compartment"
+
+[services.misc_test]
+build = { shared_objects = { exampleK = 1024, test_word = 4 }, sources = ["misc-test.cc"] }
+dependencies = ["string", "strtol"]
+kind = "compartment"
+
+[services.stack_integrity_thread]
+build.sources = ["stack_integrity_thread.cc"]
+kind = "compartment"
+
+[services.stack_test]
+build.sources = ["stack-test.cc"]
+dependencies = ["stack_integrity_thread"]
+kind = "compartment"
+
+[services.thread_pool_test]
+build.sources = ["thread_pool-test.cc"]
+dependencies = ["cxxrt"]
+kind = "compartment"
+
+[services.queue_test]
+build.sources = ["queue-test.cc"]
+dependencies = ["message_queue"]
+kind = "compartment"
+
+[services.futex_test]
+build.sources = ["futex-test.cc"]
+kind = "compartment"
+
+[services.locks_test]
+build.sources = ["locks-test.cc"]
+dependencies = ["cxxrt"]
+kind = "compartment"
+
+[services.list_test]
+build.sources = ["list-test.cc"]
+kind = "compartment"
+
+[services.eventgroup_test]
+build.sources = ["eventgroup-test.cc"]
+dependencies = ["cxxrt", "event_group"]
+kind = "compartment"
+
+[services.multiwaiter_test]
+build.sources = ["multiwaiter-test.cc"]
+dependencies = ["cxxrt", "message_queue"]
+kind = "compartment"
+
+[services.allocator_test]
+build.sources = ["allocator-test.cc"]
+dependencies = ["cxxrt"]
+kind = "compartment"
+
+[services.rust_test]
+build.sources = ["rust-test.cc"]
+kind = "compartment"
+
+[services.bitpacks_test]
+build.sources = ["bitpacks-test.cc"]
+kind = "compartment"
+
+[services.time_test]
+build.sources = ["time-test.cc"]
+dependencies = ["time"]
+kind = "compartment"
+
+[test_suite]
+cases = [
+    { name = "ccompile", prototype = false, run = false, target = "ccompile_test" },
+    { compartment = false, name = "extra_compiles", prototype = false, run = false, target = "extra_compiles_test" },
+    { compartment = false, name = "preflight", prototype = false, run = false, target = "preflight_test" },
+    { display_name = "Debug helpers (C++)", name = "debug_cxx", target = "debug_cxx_test" },
+    { display_name = "Debug helpers (C)", name = "debug_c", target = "debug_c_test" },
+    { display_name = "MMIO", name = "mmio", target = "mmio_test" },
+    { display_name = "Unwind cleanup", name = "unwind_cleanup", target = "unwind_cleanup_test" },
+    { name = "softfloat", target = "softfloat_test" },
+    { name = "stdio", target = "stdio_test" },
+    { conflicts = ["allocator"], include_in_most = false, name = "bigdata", target = "bigdata_test" },
+    { display_name = "Static sealing", name = "static_sealing", target = "static_sealing_test" },
+    { display_name = "Crash recovery", name = "crash_recovery", target = "crash_recovery_test" },
+    { name = "compartment_calls", target = "compartment_calls_test" },
+    { name = "check_pointer", target = "check_pointer_test" },
+    { name = "misc", target = "misc_test" },
+    { display_name = "Switcher stack handling", name = "stack", target = "stack_test" },
+    { display_name = "Thread pool", name = "thread_pool", target = "thread_pool_test" },
+    { absorbed_sources = ["global_constructors-test.cc"], compartment = false, name = "global_constructors", target = "global_constructors_test" },
+    { display_name = "Queue", name = "queue", target = "queue_test" },
+    { display_name = "Futex", name = "futex", target = "futex_test" },
+    { display_name = "Locks", name = "locks", target = "locks_test" },
+    { display_name = "List", name = "list", target = "list_test" },
+    { display_name = "Event groups", name = "eventgroup", target = "eventgroup_test" },
+    { display_name = "Multiwatier", name = "multiwaiter", target = "multiwaiter_test" },
+    { display_name = "Allocator", name = "allocator", target = "allocator_test" },
+    { display_name = "Rust", firmware_rust_source = "rust-test.rs", include_in_most = false, name = "rust", target = "rust_test" },
+    { name = "bitpacks", target = "bitpacks_test" },
+    { name = "time", target = "time_test" },
+]
+most_tests = true
+runner = "test_runner"
+
+[[firmwares]]
+name = "test-suite"
+libraries = ["thread_pool", "debug", "freestanding"]
+services = ["test_runner"]
+threads = [
+    { compartment = "test_runner", entry = "run_tests", name = "test-runner", priority = 3, stack_size = 0x800, trusted_stack_frames = 9 },
+    { compartment = "thread_pool", entry = "thread_pool_run", name = "thread-pool-1", priority = 2, stack_size = 0x600, trusted_stack_frames = 8 },
+    { compartment = "thread_pool", entry = "thread_pool_run", name = "thread-pool-2", priority = 1, stack_size = 0x600, trusted_stack_frames = 8 },
+]

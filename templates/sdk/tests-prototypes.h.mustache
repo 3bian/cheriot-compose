@@ -1,0 +1,12 @@
+// Copyright Microsoft and CHERIoT Contributors.
+// SPDX-License-Identifier: MIT
+
+#pragma once
+
+#include <cdefs.h>
+
+__BEGIN_DECLS
+
+{{#headers}}{{#constant}}static const int TestEnabled_{{{name}}} = {{{enabled}}};{{/constant}}{{#prototype}}{{{compartment}}}int test_{{{name}}}();{{/prototype}}{{{separator}}}{{/headers}}
+
+__END_DECLS

@@ -1,0 +1,36 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "hardware-revoker-irqs"
+board = "../../sdk/boards/ibex-safe-simulator.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.top]
+kind = "compartment"
+
+[services.top.build]
+revocable_memory = true
+sources = [
+    "top.cc",
+]
+
+[[firmwares]]
+name = "top_compartment"
+libraries = [
+    "freestanding",
+    "debug",
+]
+services = [
+    "top",
+]
+
+[[firmwares.threads]]
+name = "top"
+compartment = "top"
+entry = "entry"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 1

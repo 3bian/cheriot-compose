@@ -1,0 +1,67 @@
+# Copyright 3Bian Limited and Contributors.
+# SPDX-License-Identifier: MIT
+# Derived from cheriot-vm's CHERIoT RTOS board definition at cbc983f6e04c25b727254cb5d0371fdfc75c746d.
+
+name = "cheriot-vm"
+cpu = "cheriot"
+defines = ["RISCV_HTIF"]
+driver_includes = ["${sdk}/include/platform/cheriot-vm", "${sdk}/include/platform/generic-riscv"]
+interrupts = [
+    { name = "GpioInterrupt", number = 2, priority = 2 },
+    { name = "SpiInterrupt", number = 3, priority = 2 },
+    { name = "I2cInterrupt", number = 4, priority = 2 },
+    { name = "EthernetInterrupt", number = 5, priority = 2 },
+    { name = "StorageInterrupt", number = 6, priority = 2 },
+]
+revoker = "software"
+runner = { executable = "cheriot-vm", kind = "cheriot_vm" }
+simulation = true
+tickrate_hz = 10
+timer_hz = 2000
+
+[devices.clint]
+length = 786432
+start = 33554432
+
+[devices.clint_time]
+length = 8
+start = 33603576
+
+[devices.plic]
+length = 16
+start = 201326592
+
+[devices.uart]
+length = 256
+start = 268435456
+
+[devices.spi]
+length = 24
+start = 268439552
+
+[devices.i2c]
+length = 24
+start = 268443648
+
+[devices.gpio]
+length = 20
+start = 268447744
+
+[devices.ethernet]
+length = 36
+start = 536870912
+
+[devices.storage]
+length = 24
+start = 805306368
+
+[devices.shadow]
+length = 4096
+start = 2197815296
+
+[instruction_memory]
+end = 2147745792
+start = 2147483648
+
+[heap]
+end = 2147745792

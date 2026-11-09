@@ -1,0 +1,36 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "hello-world"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.hello]
+dependencies = [
+    "freestanding",
+    "debug",
+]
+kind = "compartment"
+
+[services.hello.build]
+sources = [
+    "hello.cc",
+]
+
+[[firmwares]]
+name = "hello_world"
+libraries = []
+services = [
+    "hello",
+]
+
+[[firmwares.threads]]
+name = "hello"
+compartment = "hello"
+entry = "say_hello"
+priority = 1
+stack_size = 512
+trusted_stack_frames = 1

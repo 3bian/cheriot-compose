@@ -1,0 +1,34 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "../freestanding/cheriot-compose.toml",
+    "../compartment_helpers/cheriot-compose.toml",
+    "../atomic/cheriot-compose.toml",
+    "../unwind_error_handler/cheriot-compose.toml",
+]
+
+[sdk_components.message_queue_library]
+dependencies = [
+    "freestanding",
+    "compartment_helpers",
+    "atomic4",
+]
+kind = "library"
+
+[sdk_components.message_queue_library.build]
+sources = [
+    "${sdk}/lib/queue/queue.cc",
+]
+
+[sdk_components.message_queue]
+dependencies = [
+    "unwind_error_handler",
+    "message_queue_library",
+]
+kind = "compartment"
+
+[sdk_components.message_queue.build]
+sources = [
+    "${sdk}/lib/queue/queue_compartment.cc",
+]

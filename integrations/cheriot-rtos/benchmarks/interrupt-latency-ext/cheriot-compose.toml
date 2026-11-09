@@ -1,0 +1,52 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "interrupt-latency-external-benchmark"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.interrupt_bench]
+dependencies = [
+    "crt",
+    "freestanding",
+    "stdio",
+    "debug",
+]
+kind = "compartment"
+
+[services.interrupt_bench.build]
+defines = [
+    "BOARD=${board}",
+    "METRIC=${options.benchmark_metric}",
+    "IRQ_SOURCE_${options.interrupt_source}",
+    "DEBUG_INTERRUPT_BENCH=${options.component_debug}",
+]
+revocable_memory = true
+sources = [
+    "interrupt_bench.cc",
+]
+
+[[firmwares]]
+name = "interrupt-benchmark"
+services = [
+    "interrupt_bench",
+]
+
+[[firmwares.threads]]
+name = "high"
+compartment = "interrupt_bench"
+entry = "entry_high_priority"
+priority = 2
+stack_size = 1024
+trusted_stack_frames = 4
+
+[[firmwares.threads]]
+name = "low"
+compartment = "interrupt_bench"
+entry = "entry_low_priority"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 4

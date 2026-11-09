@@ -1,0 +1,8 @@
+__mmio_region_start = {{{mmio_start}}};
+{{#devices}}__export_mem_{{name}} = {{{start}}};
+__export_mem_{{name}}_end = {{{end}}};
+{{/devices}}__mmio_region_end = {{{mmio_end}}};
+__export_mem_heap_end = {{{heap_end}}};
+{{#spans}}__memspan__{{name}} = {{{start}}};
+__memspan__{{name}}_end = {{{end}}};
+{{/spans}}

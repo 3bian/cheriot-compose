@@ -1,0 +1,24 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "../atomic/cheriot-compose.toml",
+]
+
+[sdk_components.locks]
+dependencies = [
+    "atomic4",
+]
+kind = "library"
+
+[sdk_components.locks.build]
+defines = [
+    "DEBUG_LOCKS=false",
+]
+sources = [
+    "${sdk}/lib/locks/locks.cc",
+    "${sdk}/lib/locks/semaphore.cc",
+    "${sdk}/lib/locks/barrier.cc",
+    "${sdk}/lib/locks/condition_variable.cc",
+    "${sdk}/lib/locks/once.cc",
+]

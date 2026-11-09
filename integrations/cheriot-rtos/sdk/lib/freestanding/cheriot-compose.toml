@@ -1,0 +1,14 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.freestanding]
+kind = "library"
+
+[sdk_components.freestanding.build]
+sources = [
+    "${sdk}/lib/freestanding/memcmp.c",
+    "${sdk}/lib/freestanding/memcpy.c",
+    "${sdk}/lib/freestanding/memset.c",
+    "${sdk}/lib/freestanding/compat.S",
+]

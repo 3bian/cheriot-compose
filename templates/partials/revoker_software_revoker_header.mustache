@@ -1,0 +1,13 @@
+
+		LONG(.software_revoker_start);
+		SHORT(.software_revoker_end - .software_revoker_start);
+		LONG(.software_revoker_globals);
+		ASSERT((SIZEOF(.software_revoker_globals) % 4) == 0, "Software revoker globals oddly sized");
+		SHORT(SIZEOF(.software_revoker_globals) / 4);
+		LONG(0)
+		SHORT(0)
+		LONG(.software_revoker_export_table);
+		SHORT(.software_revoker_export_table_end - .software_revoker_export_table);
+
+		LONG(0);
+		SHORT(0);

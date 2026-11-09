@@ -1,0 +1,13 @@
+
+		LONG(".{{{compartment}}}_code_start");
+		SHORT((SIZEOF(.{{{compartment}}}_code) + 7) / 8);
+		SHORT(".{{{compartment}}}_imports_end" - ".{{{compartment}}}_code_start");
+		LONG(".{{{compartment}}}_export_table");
+		SHORT(".{{{compartment}}}_export_table_end" - ".{{{compartment}}}_export_table");
+		LONG(0);
+		SHORT(0);
+		SHORT(0);
+		LONG(".{{{compartment}}}_cap_relocs_start");
+		SHORT(".{{{compartment}}}_cap_relocs_end" - ".{{{compartment}}}_cap_relocs_start");
+		LONG(".{{{compartment}}}_sealed_objects_start");
+		SHORT(".{{{compartment}}}_sealed_objects_end" - ".{{{compartment}}}_sealed_objects_start");

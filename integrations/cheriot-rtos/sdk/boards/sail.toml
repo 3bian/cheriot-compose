@@ -1,0 +1,39 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sail"
+defines = [
+    "SAIL",
+    "RISCV_HTIF",
+]
+driver_includes = [
+    "${sdk}/include/platform/sail",
+    "${sdk}/include/platform/generic-riscv",
+]
+interrupts = [
+    { name = "FakeInterrupt", number = 4, priority = 2 },
+]
+revoker = "software"
+runner = { executable = "cheriot_sim", failure_patterns = ["Assertion failure"] }
+simulation = true
+tickrate_hz = 10
+timer_hz = 2000
+
+[devices.clint]
+length = 65536
+start = 33554432
+
+[devices.shadow]
+end = 2197819392
+start = 2197815296
+
+[devices.uart]
+end = 268435712
+start = 268435456
+
+[instruction_memory]
+end = 2147745792
+start = 2147483648
+
+[heap]
+end = 2147745792

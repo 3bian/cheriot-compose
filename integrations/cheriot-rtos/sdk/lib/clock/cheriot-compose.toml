@@ -1,0 +1,20 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.clock_helpers]
+kind = "library"
+
+[sdk_components.clock_helpers.build]
+sources = [
+    "${sdk}/lib/clock/clock-helpers.cc",
+]
+
+[sdk_components.clock_helpers.build.shared_objects]
+wall_clock_time = 24
+
+[sdk_components.wall_clock]
+build = { shared_objects = { wall_clock_time = 24 }, sources = ["${sdk}/lib/clock/wall_clock.cc"] }
+dependencies = ["unwind_error_handler", "clock_helpers"]
+kind = "compartment"
+role = "wall_clock"

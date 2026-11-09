@@ -1,0 +1,46 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "kudu-safe-simulator"
+audit_run_command = "${sdk}/scripts/msft-safe-run-sim.sh kudu"
+defines = [
+    "MICROSOFT_CHERIOT_SAFE",
+    "RDCYCLE_OVERRIDE_CSR=mcycle",
+]
+driver_includes = [
+    "${sdk}/include/platform/kudu",
+    "${sdk}/include/platform/microsoft_cheriot_safe",
+    "${sdk}/include/platform/generic-riscv",
+]
+interrupts = [
+    { edge_triggered = true, name = "DummyInterrupt", number = 1, priority = 2 },
+]
+packaging = "microsoft_safe"
+revoker = "software"
+runner = { executable = "cheriot_kudu_safe_sim", kind = "microsoft_safe" }
+simulation = true
+tickrate_hz = 10
+timer_hz = 100000
+
+[devices.clint]
+length = 4096
+start = 335548416
+
+[devices.plic]
+end = 272629760
+start = 268435456
+
+[devices.uart]
+end = 2399187200
+start = 2399186944
+
+[devices.shadow]
+length = 8192
+start = 537911296
+
+[instruction_memory]
+end = 537395200
+start = 537133056
+
+[heap]
+end = 537395200

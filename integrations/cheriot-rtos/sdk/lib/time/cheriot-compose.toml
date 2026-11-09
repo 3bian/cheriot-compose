@@ -1,0 +1,11 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.time]
+kind = "library"
+
+[sdk_components.time.build]
+sources = [
+    "${sdk}/lib/time/timegm.cc",
+]

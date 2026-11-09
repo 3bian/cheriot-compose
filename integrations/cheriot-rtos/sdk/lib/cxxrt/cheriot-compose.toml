@@ -1,0 +1,20 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "../locks/cheriot-compose.toml",
+]
+
+[sdk_components.cxxrt]
+dependencies = [
+    "locks",
+]
+kind = "library"
+
+[sdk_components.cxxrt.build]
+defines = [
+    "DEBUG_CXXRT=false",
+]
+sources = [
+    "${sdk}/lib/cxxrt/guard.cc",
+]

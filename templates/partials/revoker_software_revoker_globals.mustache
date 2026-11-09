@@ -1,0 +1,10 @@
+
+	.software_revoker_globals : CAPALIGN
+	{
+		.software_revoker_globals = .;
+		*/cheriot.software_revoker--*.compartment(.data .data.* .sdata .sdata.*);
+		.software_revoker_bss_start = .;
+		*/cheriot.software_revoker--*.compartment(.sbss .sbss.* .bss .bss.*)
+		. = ALIGN(8);
+	}
+	.software_revoker_globals_end = .;

@@ -1,0 +1,8 @@
+
+	. = ALIGN(16);
+	.thread_stack_{{{thread_id}}} : CAPALIGN
+	{
+		.thread_{{{thread_id}}}_stack_start = .;
+		. += {{{stack_size}}};
+		.thread_{{{thread_id}}}_stack_end = .;
+	}

@@ -1,0 +1,8 @@
+
+		SHORT({{{priority}}});
+		LONG({{{mangled_entry_point}}});
+		LONG(.thread_{{{thread_id}}}_stack_start);
+		SHORT(.thread_{{{thread_id}}}_stack_end - .thread_{{{thread_id}}}_stack_start);
+		LONG(.thread_{{{thread_id}}}_trusted_stack_start);
+		SHORT(.thread_{{{thread_id}}}_trusted_stack_end - .thread_{{{thread_id}}}_trusted_stack_start);
+

@@ -1,0 +1,61 @@
+(
+verify_ownership
+stage=$(mktemp -d {{{stage_template}}})
+installed_elf=false
+installed_report=false
+installed_marker=false
+moved_elf=false
+moved_report=false
+moved_marker=false
+committed=false
+registry_tmp=''
+cleanup_stage() {
+    recovery_ok=true
+    if ! "$committed"; then
+        if "$installed_elf"; then rm -f -- "$final_elf" || recovery_ok=false; fi
+        if "$installed_report"; then rm -f -- "$final_report" || recovery_ok=false; fi
+        if "$installed_marker"; then rm -f -- "$owner_marker" || recovery_ok=false; fi
+        if "$moved_elf"; then mv -- "$stage/old.elf" "$final_elf" || recovery_ok=false; fi
+        if "$moved_report"; then mv -- "$stage/old.json" "$final_report" || recovery_ok=false; fi
+        if "$moved_marker"; then mv -- "$stage/old.marker" "$owner_marker" || recovery_ok=false; fi
+    fi
+    if "$recovery_ok"; then
+        if test -n "$registry_tmp"; then rm -f -- "$registry_tmp"; fi
+        rm -f -- "$stage/new.elf" "$stage/new.json" "$stage/new.marker" "$stage/old.elf" "$stage/old.json" "$stage/old.marker" "$stage/registry"
+        rmdir -- "$stage" 2>/dev/null || :
+    else
+        printf 'Publication recovery files remain in %s\n' "$stage" >&2
+    fi
+}
+trap cleanup_stage 0
+trap 'exit 1' 1 2 3 15
+cp -p -- {{{source_elf}}} "$stage/new.elf"
+elf_sum=$(checksum "$stage/new.elf")
+report_sum='-'
+{{#report}}
+cp -p -- {{{source_report}}} "$stage/new.json"
+report_sum=$(checksum "$stage/new.json")
+{{/report}}
+printf '%s\n%s\n%s\n%s\n' {{{marker_version}}} "$expected_owner" "$elf_sum" "$report_sum" > "$stage/new.marker"
+registry={{{registry}}}
+if test -e "$registry"; then
+    test -f "$registry" || { printf 'Invalid publication registry: %s\n' "$registry" >&2; exit 1; }
+    if ! matches_exact "$registry" {{{registry_enabled}}} && ! matches_exact "$registry" {{{registry_disabled}}}; then
+        printf 'Publication registry belongs to another destination: %s\n' "$registry" >&2; exit 1
+    fi
+fi
+# The registry lives in the intermediate directory and may be on another filesystem.
+registry_tmp=$(mktemp "$registry.tmp.XXXXXX")
+printf '%s' {{{registry_content}}} > "$registry_tmp"
+mv -- "$registry_tmp" "$registry"
+registry_tmp=''
+if "$has_marker" && test -e "$final_elf"; then mv -- "$final_elf" "$stage/old.elf"; moved_elf=true; fi
+if test "$old_report" != '-' && test -e "$final_report"; then mv -- "$final_report" "$stage/old.json"; moved_report=true; fi
+if "$has_marker"; then mv -- "$owner_marker" "$stage/old.marker"; moved_marker=true; fi
+mv -- "$stage/new.elf" "$final_elf"; installed_elf=true
+{{#report}}
+mv -- "$stage/new.json" "$final_report"; installed_report=true
+{{/report}}
+mv -- "$stage/new.marker" "$owner_marker"; installed_marker=true
+committed=true
+)

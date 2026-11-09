@@ -1,0 +1,65 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.math32]
+kind = "library"
+
+[sdk_components.math32.build]
+force_includes = [
+    "${sdk}/lib/math/math.h",
+    "${sdk}/lib/math/compat.h",
+]
+includes = [
+    "${sdk}/third_party/msun/include",
+    "${sdk}/lib/math",
+]
+sources = [
+    "${sdk}/third_party/msun/e_expf.c",
+    "${sdk}/third_party/msun/e_logf.c",
+    "${sdk}/third_party/msun/e_log2f.c",
+    "${sdk}/third_party/msun/e_log10f.c",
+    "${sdk}/third_party/msun/e_sqrtf.c",
+    "${sdk}/third_party/msun/s_exp2f.c",
+    "${sdk}/third_party/msun/s_floorf.c",
+    "${sdk}/third_party/msun/s_fmaximum_numf.c",
+    "${sdk}/third_party/msun/s_fminimum_numf.c",
+    "${sdk}/third_party/msun/s_roundf.c",
+    "${sdk}/third_party/msun/s_ceilf.c",
+]
+
+[sdk_components.math64]
+kind = "library"
+
+[sdk_components.math64.build]
+force_includes = [
+    "${sdk}/lib/math/math.h",
+    "${sdk}/lib/math/compat.h",
+]
+includes = [
+    "${sdk}/third_party/msun/include",
+    "${sdk}/lib/math",
+]
+sources = [
+    "${sdk}/third_party/msun/e_exp.c",
+    "${sdk}/third_party/msun/e_log.c",
+    "${sdk}/third_party/msun/e_log2.c",
+    "${sdk}/third_party/msun/e_log10.c",
+    "${sdk}/third_party/msun/e_sqrt.c",
+    "${sdk}/third_party/msun/s_exp2.c",
+    "${sdk}/third_party/msun/s_floor.c",
+    "${sdk}/third_party/msun/s_fmaximum_num.c",
+    "${sdk}/third_party/msun/s_fminimum_num.c",
+    "${sdk}/third_party/msun/s_round.c",
+    "${sdk}/third_party/msun/s_ceil.c",
+]
+
+[sdk_components.math]
+dependencies = [
+    "math32",
+    "math64",
+]
+kind = "group"
+
+[sdk_components.math.build]
+sources = []

@@ -1,0 +1,73 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "interrupt-latency-benchmark"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.interrupt_bench]
+dependencies = [
+    "crt",
+    "freestanding",
+    "stdio",
+    "debug",
+]
+kind = "compartment"
+
+[services.interrupt_bench.build]
+defines = [
+    "BOARD=${board}",
+    "DEBUG_INTERRUPT_BENCH=${options.component_debug}",
+]
+sources = [
+    "interrupt_bench.cc",
+]
+
+[[firmwares]]
+name = "interrupt-benchmark"
+services = [
+    "interrupt_bench",
+]
+
+[[firmwares.threads]]
+name = "high-4096"
+compartment = "interrupt_bench"
+entry = "entry_high_priority"
+priority = 2
+stack_size = 4096
+trusted_stack_frames = 4
+
+[[firmwares.threads]]
+name = "high-2048"
+compartment = "interrupt_bench"
+entry = "entry_high_priority"
+priority = 2
+stack_size = 2048
+trusted_stack_frames = 4
+
+[[firmwares.threads]]
+name = "high-1024"
+compartment = "interrupt_bench"
+entry = "entry_high_priority"
+priority = 2
+stack_size = 1024
+trusted_stack_frames = 4
+
+[[firmwares.threads]]
+name = "high-512"
+compartment = "interrupt_bench"
+entry = "entry_high_priority"
+priority = 2
+stack_size = 512
+trusted_stack_frames = 4
+
+[[firmwares.threads]]
+name = "low-512"
+compartment = "interrupt_bench"
+entry = "entry_low_priority"
+priority = 1
+stack_size = 512
+trusted_stack_frames = 4

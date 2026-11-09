@@ -1,0 +1,11 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.unwind_error_handler]
+kind = "object"
+
+[sdk_components.unwind_error_handler.build]
+sources = [
+    "${sdk}/lib/unwind_error_handler/unwind.S",
+]

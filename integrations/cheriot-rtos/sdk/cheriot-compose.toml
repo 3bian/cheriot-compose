@@ -1,0 +1,23 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "lib/cheriot-compose.toml",
+]
+
+[sdk_compatibility]
+integration = "CHERIoT RTOS"
+required_directories = ["include", "include/c++-config", "include/libc++"]
+required_files = [
+    { contains = "__cheri_compartment", path = "include/cdefs.h" },
+    { contains = "SCHEDULER_MULTIWAITER", path = "core/scheduler/main.cc" },
+    { contains = "__Z26compartment_switcher_entryz", path = "core/switcher/entry.S" },
+    { path = "core/loader/boot.S" },
+    { path = "core/loader/boot.cc" },
+    { path = "core/loader/loader.ldscript" },
+    { path = "core/token_library/token_unseal.S" },
+    { path = "compartment.ldscript" },
+    { path = "library.ldscript" },
+    { path = "privileged-compartment.ldscript" },
+    { path = "include/magic_enum/magic_enum.hpp" },
+]

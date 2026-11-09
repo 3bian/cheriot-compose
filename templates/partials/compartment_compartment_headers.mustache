@@ -1,0 +1,15 @@
+
+		LONG(".{{{compartment}}}_code_start");
+		SHORT((SIZEOF(.{{{compartment}}}_code) + 7) / 8);
+		SHORT(".{{{compartment}}}_imports_end" - ".{{{compartment}}}_code_start");
+		LONG(".{{{compartment}}}_export_table");
+		SHORT(".{{{compartment}}}_export_table_end" - ".{{{compartment}}}_export_table");
+		LONG(".{{{compartment}}}_globals");
+		ASSERT((SIZEOF(".{{{compartment}}}_globals") % 4) == 0, "{{{compartment}}}'s globals oddly sized");
+		ASSERT(SIZEOF(".{{{compartment}}}_globals") < 0x40000, "{{{compartment}}}'s globals are too large");
+		SHORT(SIZEOF(".{{{compartment}}}_globals") / 4);
+		SHORT(".{{{compartment}}}_bss_start" - ".{{{compartment}}}_globals");
+		LONG(".{{{compartment}}}_cap_relocs_start");
+		SHORT(".{{{compartment}}}_cap_relocs_end" - ".{{{compartment}}}_cap_relocs_start");
+		LONG(".{{{compartment}}}_sealed_objects_start");
+		SHORT(".{{{compartment}}}_sealed_objects_end" - ".{{{compartment}}}_sealed_objects_start");

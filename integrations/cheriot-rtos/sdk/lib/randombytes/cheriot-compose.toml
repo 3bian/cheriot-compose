@@ -1,0 +1,17 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "../cxxrt/cheriot-compose.toml",
+]
+
+[sdk_components.randombytes]
+dependencies = [
+    "cxxrt",
+]
+kind = "compartment"
+
+[sdk_components.randombytes.build]
+sources = [
+    "${sdk}/lib/randombytes/randombytes.cc",
+]

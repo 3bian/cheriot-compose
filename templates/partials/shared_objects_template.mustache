@@ -1,0 +1,8 @@
+
+		. = ALIGN(MIN({{{size}}}, 8));
+		__cheriot_shared_object_section_{{{global}}} : CAPALIGN
+		{
+			__cheriot_shared_object_{{{global}}} = .;
+			. += {{{size}}};
+			__cheriot_shared_object_{{{global}}}_end = .;
+		}

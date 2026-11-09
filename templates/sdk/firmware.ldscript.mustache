@@ -1,0 +1,26 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+PHDRS
+{
+	headers PT_PHDR PHDRS ;
+
+	# We define multiple loadable sections.  The build system will instantiate
+	# at least two, depending on the board configuration, for "rocode" and
+	# "rwdata", and perhaps others.
+	{{#segments}}{{>layout_phdr}}{{/segments}}
+}
+
+SECTIONS
+{
+	# The build system generates sections and assigns them within its PHDRs.
+	{{#segments}}{{#after_first}}
+{{/after_first}}{{>layout_section}}{{/segments}}
+
+	/DISCARD/ : {
+    	*(.note.cheriot.compartment-name)
+	}
+
+	# Explicitly discard allocating sections from the loader not claimed elsewhere.
+	/DISCARD/ : { INPUT_SECTION_FLAGS (SHF_ALLOC) *.loader.o(*) }
+}

@@ -1,0 +1,11 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.event_group]
+kind = "library"
+
+[sdk_components.event_group.build]
+sources = [
+    "${sdk}/lib/event_group/event_group.cc",
+]

@@ -1,0 +1,9 @@
+
+	. = ALIGN(8);
+	.thread_trusted_stack_{{{thread_id}}} : CAPALIGN
+	{
+		.thread_{{{thread_id}}}_trusted_stack_start = .;
+		. += __cheriot_switcher_trusted_stack_base_size;
+		. += __cheriot_switcher_trusted_stack_frame_size * {{{trusted_stack_frames}}};
+		.thread_{{{thread_id}}}_trusted_stack_end = .;
+	}

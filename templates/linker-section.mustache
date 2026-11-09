@@ -1,0 +1,5 @@
+
+	.load{{ix}}_pre_stub : { } :load{{ix}}
+	. = {{{start_string}}} ;
+	{{{body}}}
+	.load{{ix}}_post_stub : ALIGN(4) { }

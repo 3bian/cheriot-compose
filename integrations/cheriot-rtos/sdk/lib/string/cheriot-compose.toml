@@ -1,0 +1,20 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.string]
+kind = "library"
+
+[sdk_components.string.build]
+sources = [
+    "${sdk}/lib/string/strcmp.c",
+    "${sdk}/lib/string/strlen.c",
+    "${sdk}/lib/string/strnlen.c",
+    "${sdk}/lib/string/strncpy.c",
+    "${sdk}/lib/string/strstr.cc",
+    "${sdk}/lib/string/strchr.c",
+    "${sdk}/lib/string/strlcpy.c",
+    "${sdk}/lib/string/memchr.c",
+    "${sdk}/lib/string/memrchr.c",
+    "${sdk}/lib/string/memccpy.c",
+]

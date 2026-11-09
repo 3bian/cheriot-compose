@@ -1,0 +1,44 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "hello-safe-compartment"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.uart]
+kind = "compartment"
+
+[services.uart.build]
+sources = [
+    "uart.cc",
+]
+
+[services.hello]
+kind = "compartment"
+
+[services.hello.build]
+sources = [
+    "hello.cc",
+]
+
+[[firmwares]]
+name = "hello_safe_compartment"
+libraries = [
+    "freestanding",
+    "debug",
+]
+services = [
+    "hello",
+    "uart",
+]
+
+[[firmwares.threads]]
+name = "hello"
+compartment = "hello"
+entry = "entry"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 2

@@ -1,0 +1,18 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+include = [
+    "../string/cheriot-compose.toml",
+]
+
+[sdk_components.stdio]
+dependencies = [
+    "string",
+]
+kind = "library"
+role = "stdio"
+
+[sdk_components.stdio.build]
+sources = [
+    "${sdk}/lib/stdio/printf.cc",
+]

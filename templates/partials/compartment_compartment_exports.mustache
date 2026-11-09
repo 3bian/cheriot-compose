@@ -1,0 +1,4 @@
+
+		. = ALIGN(8); ".{{{compartment}}}_export_table" = .;
+		"{{{obj}}}"(.compartment_export_table);
+		".{{{compartment}}}_export_table_end" = .;

@@ -1,0 +1,43 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "keep-ticking"
+board = "../../sdk/boards/ibex-safe-simulator.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.top]
+kind = "compartment"
+
+[services.top.build]
+sources = [
+    "top.cc",
+]
+
+[[firmwares]]
+name = "keep_ticking"
+libraries = [
+    "freestanding",
+    "debug",
+]
+services = [
+    "top",
+]
+
+[[firmwares.threads]]
+name = "entry1"
+compartment = "top"
+entry = "entry1"
+priority = 0
+stack_size = 768
+trusted_stack_frames = 1
+
+[[firmwares.threads]]
+name = "entry2"
+compartment = "top"
+entry = "entry2"
+priority = 0
+stack_size = 768
+trusted_stack_frames = 1

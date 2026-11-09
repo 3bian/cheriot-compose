@@ -1,0 +1,412 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.softfloat32add]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32add.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/addsf3.c",
+]
+
+[sdk_components.softfloat64add]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64add.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/adddf3.c",
+]
+
+[sdk_components.softfloat32sub]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32sub.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/subsf3.c",
+]
+
+[sdk_components.softfloat64sub]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64sub.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/subdf3.c",
+]
+
+[sdk_components.softfloat32mul]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32mul.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/mulsf3.c",
+]
+
+[sdk_components.softfloat64mul]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64mul.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/muldf3.c",
+]
+
+[sdk_components.softfloat32div]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32div.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/divsf3.c",
+]
+
+[sdk_components.softfloat64div]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64div.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/divdf3.c",
+]
+
+[sdk_components.softfloat32neg]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32neg.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/negsf2.c",
+]
+
+[sdk_components.softfloat32compare]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32compare.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/comparesf2.c",
+]
+
+[sdk_components.softfloat32pow]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32pow.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/powisf2.c",
+]
+
+[sdk_components.softfloat32complex]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32complex.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/mulsc3.c",
+    "${sdk}/third_party/compiler-rt/divsc3.c",
+]
+
+[sdk_components.softfloat64neg]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64neg.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/negdf2.c",
+]
+
+[sdk_components.softfloat64compare]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64compare.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/comparedf2.c",
+]
+
+[sdk_components.softfloat64pow]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64pow.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/powidf2.c",
+]
+
+[sdk_components.softfloat64complex]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64complex.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/muldc3.c",
+    "${sdk}/third_party/compiler-rt/divdc3.c",
+]
+
+[sdk_components.softfloat3264convert]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat3264convert.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/truncdfsf2.c",
+    "${sdk}/third_party/compiler-rt/extendsfdf2.c",
+    "${sdk}/third_party/compiler-rt/fixunsdfsi.c",
+    "${sdk}/third_party/compiler-rt/floatunsidf.c",
+]
+
+[sdk_components.softfloat3216convert]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat3216convert.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/extendhfsf2.c",
+    "${sdk}/third_party/compiler-rt/truncsfhf2.c",
+]
+
+[sdk_components.softfloat32convert]
+dependencies = [
+    "softfloat64mul",
+    "softfloat64add",
+    "softfloat3264convert",
+]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat32convert.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/fixsfsi.c",
+    "${sdk}/third_party/compiler-rt/fixsfdi.c",
+    "${sdk}/third_party/compiler-rt/fixunssfsi.c",
+    "${sdk}/third_party/compiler-rt/fixunssfdi.c",
+    "${sdk}/third_party/compiler-rt/floatsisf.c",
+    "${sdk}/third_party/compiler-rt/floatdisf.c",
+    "${sdk}/third_party/compiler-rt/floattisf.c",
+    "${sdk}/third_party/compiler-rt/floatunsisf.c",
+    "${sdk}/third_party/compiler-rt/floatundisf.c",
+    "${sdk}/third_party/compiler-rt/floatuntisf.c",
+]
+
+[sdk_components.softfloat64convert]
+dependencies = [
+    "softfloat3264convert",
+]
+kind = "library"
+role = "softfloat"
+
+[sdk_components.softfloat64convert.build]
+defines = [
+    "__SOFTFP__",
+]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+    "${sdk}/third_party/compiler-rt/fixdfsi.c",
+    "${sdk}/third_party/compiler-rt/fixdfdi.c",
+    "${sdk}/third_party/compiler-rt/fixunsdfdi.c",
+    "${sdk}/third_party/compiler-rt/floatsidf.c",
+    "${sdk}/third_party/compiler-rt/floatdidf.c",
+    "${sdk}/third_party/compiler-rt/floattidf.c",
+    "${sdk}/third_party/compiler-rt/floatundidf.c",
+    "${sdk}/third_party/compiler-rt/floatuntidf.c",
+]
+
+[sdk_components.softfloat32]
+dependencies = [
+    "softfloat32add",
+    "softfloat32sub",
+    "softfloat32mul",
+    "softfloat32div",
+    "softfloat32neg",
+    "softfloat32convert",
+    "softfloat32compare",
+]
+kind = "group"
+
+[sdk_components.softfloat32.build]
+sources = []
+
+[sdk_components.softfloat64]
+dependencies = [
+    "softfloat64add",
+    "softfloat64sub",
+    "softfloat64mul",
+    "softfloat64div",
+    "softfloat64neg",
+    "softfloat64convert",
+    "softfloat64compare",
+]
+kind = "group"
+
+[sdk_components.softfloat64.build]
+sources = []
+
+[sdk_components.softfloat]
+dependencies = [
+    "softfloat32",
+    "softfloat64",
+    "softfloat3264convert",
+]
+kind = "library"
+
+[sdk_components.softfloat.build]
+force_includes = [
+    "${sdk}/lib/softfloat/softfloat.h",
+]
+sources = [
+    "${sdk}/third_party/compiler-rt/fp_mode.c",
+]
+
+[sdk_components.softfloatall]
+dependencies = [
+    "softfloat",
+    "softfloat32pow",
+    "softfloat64pow",
+    "softfloat32complex",
+    "softfloat64complex",
+]
+kind = "group"
+
+[sdk_components.softfloatall.build]
+sources = []

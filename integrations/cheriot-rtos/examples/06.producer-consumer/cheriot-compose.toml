@@ -1,0 +1,39 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "producer-consumer"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+    "components/cheriot-compose.toml",
+]
+mode = "release"
+sdk = "../../sdk"
+
+[[firmwares]]
+name = "producer-consumer"
+libraries = [
+    "freestanding",
+    "message_queue",
+    "debug",
+]
+services = [
+    "producer",
+    "consumer",
+]
+
+[[firmwares.threads]]
+name = "producer-main"
+compartment = "producer"
+entry = "run"
+priority = 1
+stack_size = 1280
+trusted_stack_frames = 5
+
+[[firmwares.threads]]
+name = "consumer-main"
+compartment = "consumer"
+entry = "run"
+priority = 1
+stack_size = 1280
+trusted_stack_frames = 3

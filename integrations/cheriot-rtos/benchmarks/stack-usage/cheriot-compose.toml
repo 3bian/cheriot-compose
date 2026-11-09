@@ -1,0 +1,50 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "stack-usage-benchmark"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.callee]
+kind = "compartment"
+
+[services.callee.build]
+sources = [
+    "callee.cc",
+]
+
+[services.caller]
+kind = "compartment"
+
+[services.caller.build]
+defines = [
+    "BOARD=${board}",
+]
+sources = [
+    "caller.cc",
+]
+
+[[firmwares]]
+name = "stack-usage-benchmark"
+libraries = [
+    "crt",
+    "freestanding",
+    "atomic",
+    "stdio",
+    "debug",
+]
+services = [
+    "caller",
+    "callee",
+]
+
+[[firmwares.threads]]
+name = "caller"
+compartment = "caller"
+entry = "run"
+priority = 1
+stack_size = 4096
+trusted_stack_frames = 3

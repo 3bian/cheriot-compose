@@ -1,0 +1,14 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sonata-1.3"
+extends = "sonata-1.1.toml"
+
+[[patches]]
+op = "add"
+path = "/interrupts/-"
+
+[patches.value]
+name = "GpioInterrupt"
+number = 4
+priority = 3

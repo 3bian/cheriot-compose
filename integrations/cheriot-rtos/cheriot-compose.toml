@@ -1,0 +1,26 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[workspace.projects]
+audit = "examples/10.audit/cheriot-compose.toml"
+benchmark-allocation = "benchmarks/allocation/cheriot-compose.toml"
+benchmark-compartment-call = "benchmarks/compartment-call/cheriot-compose.toml"
+benchmark-interrupt-latency = "benchmarks/interrupt-latency/cheriot-compose.toml"
+benchmark-interrupt-latency-ext = "benchmarks/interrupt-latency-ext/cheriot-compose.toml"
+benchmark-stack-usage = "benchmarks/stack-usage/cheriot-compose.toml"
+error-handling = "examples/07.error_handling/cheriot-compose.toml"
+exercise-compartmentalisation = "exercises/01.compartmentalisation/cheriot-compose.toml"
+hello-compartment = "examples/02.hello_compartment/cheriot-compose.toml"
+hello-safe-compartment = "examples/03.hello_safe_compartment/cheriot-compose.toml"
+hello-world = "examples/01.hello_world/cheriot-compose.toml"
+javascript = "examples/09.javascript/cheriot-compose.toml"
+memory-safety = "examples/08.memory_safety/cheriot-compose.toml"
+producer-consumer = "examples/06.producer-consumer/cheriot-compose.toml"
+sealing = "examples/05.sealing/cheriot-compose.toml"
+temporal-safety = "examples/04.temporal_safety/cheriot-compose.toml"
+test-hardware-revoker-irqs = "tests.extra/hardware_revoker_IRQs/cheriot-compose.toml"
+test-keep-ticking = "tests.extra/keep_ticking/cheriot-compose.toml"
+test-regress-double-ref-shared = "tests.extra/regress-double_ref_shared/cheriot-compose.toml"
+test-regress-thread-exit-irq = "tests.extra/regress-thread_exit_IRQ/cheriot-compose.toml"
+tests = "tests/cheriot-compose.toml"

@@ -1,0 +1,47 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sealing"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.identifier]
+dependencies = [
+    "cxxrt",
+]
+kind = "compartment"
+
+[services.identifier.build]
+sources = [
+    "identifier.cc",
+]
+
+[services.caller]
+kind = "compartment"
+
+[services.caller.build]
+sources = [
+    "caller.cc",
+]
+
+[[firmwares]]
+name = "sealing"
+libraries = [
+    "freestanding",
+    "debug",
+]
+services = [
+    "caller",
+    "identifier",
+]
+
+[[firmwares.threads]]
+name = "caller"
+compartment = "caller"
+entry = "entry"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 3

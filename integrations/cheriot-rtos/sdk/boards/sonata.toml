@@ -1,0 +1,5 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sonata"
+extends = "sonata-1.1.toml"

@@ -1,0 +1,121 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "compartment-call-benchmark"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[libraries.libcallee]
+kind = "library"
+
+[libraries.libcallee.build]
+defines = [
+    "METRIC=${options.benchmark_metric}",
+]
+sources = [
+    "libcallee.cc",
+]
+
+[services.callee]
+kind = "compartment"
+
+[services.callee.build]
+defines = [
+    "METRIC=${options.benchmark_metric}",
+]
+sources = [
+    "callee.cc",
+]
+
+[services.callee_seh]
+dependencies = [
+    "unwind_error_handler",
+]
+kind = "compartment"
+
+[services.callee_seh.build]
+sources = [
+    "callee_seh.cc",
+]
+
+[services.callee_ueh]
+kind = "compartment"
+
+[services.callee_ueh.build]
+sources = [
+    "callee_ueh.cc",
+]
+
+[services.caller]
+kind = "compartment"
+
+[services.caller.build]
+defines = [
+    "BOARD=${board}",
+    "METRIC=${options.benchmark_metric}",
+    "DEBUG_CALLER=${options.component_debug}",
+]
+sources = [
+    "caller.cc",
+]
+
+[[firmwares]]
+name = "compartment-call-benchmark"
+libraries = [
+    "crt",
+    "freestanding",
+    "atomic",
+    "stdio",
+    "string",
+    "debug",
+    "libcallee",
+]
+services = [
+    "caller",
+    "callee",
+    "callee_seh",
+    "callee_ueh",
+]
+
+[[firmwares.threads]]
+name = "caller-256"
+compartment = "caller"
+entry = "run"
+priority = 1
+stack_size = 256
+trusted_stack_frames = 3
+
+[[firmwares.threads]]
+name = "caller-512"
+compartment = "caller"
+entry = "run"
+priority = 1
+stack_size = 512
+trusted_stack_frames = 3
+
+[[firmwares.threads]]
+name = "caller-1024"
+compartment = "caller"
+entry = "run"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 3
+
+[[firmwares.threads]]
+name = "caller-2048"
+compartment = "caller"
+entry = "run"
+priority = 1
+stack_size = 2048
+trusted_stack_frames = 3
+
+[[firmwares.threads]]
+name = "caller-4096"
+compartment = "caller"
+entry = "run"
+priority = 1
+stack_size = 4096
+trusted_stack_frames = 3

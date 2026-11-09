@@ -1,0 +1,8 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "sail-ibex"
+extends = "sail.toml"
+patches = [
+    { op = "add", path = "/cpu", value = "cheriot-ibex" },
+]

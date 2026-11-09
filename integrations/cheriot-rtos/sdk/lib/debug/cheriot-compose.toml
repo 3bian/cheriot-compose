@@ -1,0 +1,12 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.debug]
+kind = "library"
+role = "debug"
+
+[sdk_components.debug.build]
+sources = [
+    "${sdk}/lib/debug/debug.cc",
+]

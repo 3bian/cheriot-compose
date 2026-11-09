@@ -1,0 +1,44 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+name = "memory-safety"
+board = "../../sdk/boards/sail.toml"
+include = [
+    "../../sdk/cheriot-compose.toml",
+]
+sdk = "../../sdk"
+
+[services.memory_safety_inner]
+kind = "compartment"
+
+[services.memory_safety_inner.build]
+sources = [
+    "memory_safety_inner.cc",
+]
+
+[services.memory_safety_runner]
+kind = "compartment"
+
+[services.memory_safety_runner.build]
+sources = [
+    "memory_safety_runner.cc",
+]
+
+[[firmwares]]
+name = "memory_safety"
+libraries = [
+    "freestanding",
+    "debug",
+]
+services = [
+    "memory_safety_runner",
+    "memory_safety_inner",
+]
+
+[[firmwares.threads]]
+name = "runner"
+compartment = "memory_safety_runner"
+entry = "entry"
+priority = 1
+stack_size = 1024
+trusted_stack_frames = 5

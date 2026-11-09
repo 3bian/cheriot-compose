@@ -1,0 +1,11 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.crt]
+kind = "library"
+
+[sdk_components.crt.build]
+sources = [
+    "${sdk}/lib/crt/arith64.c",
+]

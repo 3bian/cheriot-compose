@@ -1,0 +1,14 @@
+# Copyright Microsoft and CHERIoT Contributors.
+# SPDX-License-Identifier: MIT
+
+
+[sdk_components.compartment_helpers]
+kind = "library"
+
+[sdk_components.compartment_helpers.build]
+sources = [
+    "${sdk}/lib/compartment_helpers/claim_fast.cc",
+    "${sdk}/lib/compartment_helpers/check_pointer.cc",
+    "${sdk}/lib/compartment_helpers/timeout.cc",
+    "${sdk}/lib/compartment_helpers/polling.cc",
+]

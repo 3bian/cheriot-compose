@@ -1,0 +1,42 @@
+(
+stage=$(mktemp -d "$intermediate_dir/.link-stage.XXXXXX")
+success=false
+cleanup_link() {
+    recovered=true
+    {{#outputs}}
+    if ! "$success"; then
+        if test -e "$stage/old-{{index}}"; then
+            rm -f -- {{{path}}} || recovered=false
+            mv -- "$stage/old-{{index}}" {{{path}}} || recovered=false
+        elif test -e "$stage/absent-{{index}}"; then
+            rm -f -- {{{path}}} || recovered=false
+        fi
+    else
+        rm -f -- "$stage/old-{{index}}" || recovered=false
+    fi
+    {{/outputs}}
+    if "$recovered"; then
+        {{#outputs}}rm -f -- "$stage/absent-{{index}}"
+        {{/outputs}}
+        rmdir -- "$stage" 2>/dev/null || :
+    else
+        printf 'Linker recovery files remain in %s\n' "$stage" >&2
+    fi
+}
+trap cleanup_link 0
+trap 'exit 1' 1 2 3 15
+{{#outputs}}
+if test -e {{{path}}}; then
+    test -f {{{path}}} || { printf '%s\n' {{{invalid_message}}} >&2; exit 1; }
+    mv -- {{{path}}} "$stage/old-{{index}}"
+else
+    : > "$stage/absent-{{index}}"
+fi
+{{/outputs}}
+{{{command}}}
+{{#outputs}}
+guard_path {{{path}}}
+test -f {{{path}}} || { printf '%s\n' {{{missing_message}}} >&2; exit 1; }
+{{/outputs}}
+success=true
+)

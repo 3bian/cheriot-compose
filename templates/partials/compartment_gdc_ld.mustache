@@ -1,0 +1,9 @@
+
+	".{{{compartment}}}_globals" : CAPALIGN
+	{
+		".{{{compartment}}}_globals" = .;
+		"{{{obj}}}"(.data);
+		".{{{compartment}}}_bss_start" = .;
+		"{{{obj}}}"(.bss)
+		. = ALIGN(4);
+	}
