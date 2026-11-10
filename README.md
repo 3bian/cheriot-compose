@@ -230,7 +230,7 @@ cargo install --locked --path . --jobs 1
 
 # Build and install the CHERIoT compiler.
 cmake -S "$CHERIOT_LLVM/llvm" \
-  -B "$CHERIOT_LLVM/build-lowmem" \
+  -B "$CHERIOT_LLVM/build" \
   -G "Unix Makefiles" \
   -DCLANG_ENABLE_CIR=OFF \
   -DCLANG_ENABLE_OBJC_REWRITER=OFF \
@@ -261,7 +261,7 @@ cmake -S "$CHERIOT_LLVM/llvm" \
   -DLLVM_TARGETS_TO_BUILD=RISCV \
   -DLLVM_USE_LINKER=lld
 
-cmake --build "$CHERIOT_LLVM/build-lowmem" \
+cmake --build "$CHERIOT_LLVM/build" \
   --parallel 1 --target install-distribution
 
 "$CHERIOT_TOOLS/bin/clang" --version
