@@ -9,6 +9,9 @@ use test_fixture::TestFixture;
 #[path = "cli/execution.rs"]
 mod execution;
 
+#[path = "cli/help.rs"]
+mod help;
+
 #[path = "support/test_fixture.rs"]
 mod test_fixture;
 fn run(fixture: &TestFixture, arguments: &[&str]) -> std::process::Output {
@@ -96,7 +99,7 @@ fn command_string_database_is_read_without_execution() {
     let output = Command::new(env!("CARGO_BIN_EXE_cheriot-compose"))
         .current_dir(&fixture.directory)
         .env("CC", "")
-        .args(["compare-compilation-database", "--against"])
+        .args(["compare-compilation-db", "--against"])
         .arg(fixture.directory.join("old.json"))
         .arg("--generated")
         .arg(fixture.directory.join("new.json"))
@@ -196,18 +199,11 @@ fn command_must_come_first_and_help_is_command_specific() {
         }
     }
     let help = Command::new(executable)
-        .args(["help", "build"])
+        .args(["build", "--help"])
         .output()
         .unwrap();
     assert!(help.status.success());
     assert!(String::from_utf8_lossy(&help.stdout).contains("cheriot-compose build"));
-    assert!(
-        Command::new(executable)
-            .arg("version")
-            .status()
-            .unwrap()
-            .success()
-    );
     let repeated = Command::new(executable)
         .args(["check", "--file", "one.toml", "--file", "two.toml"])
         .output()
@@ -393,13 +389,13 @@ fn help_matches_command_options_and_unrelated_options_are_rejected() {
             vec!["--file", "--toolchain-dir"],
         ),
         (
-            "compare-compilation-database",
+            "compare-compilation-db",
             vec!["--against", "--generated", "--map-path"],
             vec!["--jobs", "--output-dir"],
         ),
     ] {
         let help = Command::new(executable)
-            .args(["help", command])
+            .args([command, "-h"])
             .output()
             .unwrap();
         let after_command = Command::new(executable)
@@ -423,7 +419,7 @@ fn help_matches_command_options_and_unrelated_options_are_rejected() {
         vec!["run", "--format", "json"],
         vec!["analyze-switcher", "--toolchain-dir", "/tools"],
         vec![
-            "compare-compilation-database",
+            "compare-compilation-db",
             "--generated",
             "new.json",
             "--file",
@@ -439,13 +435,14 @@ fn help_matches_command_options_and_unrelated_options_are_rejected() {
 }
 
 #[test]
-fn standalone_help_and_version_ignore_project_and_toolchain_environment() {
+fn help_ignores_project_and_toolchain_environment() {
     let fixture = TestFixture::new();
     for args in [
-        vec!["help"],
-        vec!["help", "build"],
+        vec![],
+        vec!["-h"],
+        vec!["--help"],
+        vec!["build", "-h"],
         vec!["build", "--help"],
-        vec!["version"],
     ] {
         let output = Command::new(env!("CARGO_BIN_EXE_cheriot-compose"))
             .current_dir(&fixture.directory)
@@ -510,16 +507,16 @@ fn command_help_and_parser_agree_on_formats_and_defaults() {
         ("build", vec!["json"], "human"),
         ("package", vec!["json"], "human"),
         ("size", vec!["text", "json", "bytes"], "text"),
-        ("compare-compilation-database", vec!["text", "json"], "text"),
+        ("compare-compilation-db", vec!["text", "json"], "text"),
     ] {
         let help = Command::new(binary)
-            .args(["help", command])
+            .args([command, "--help"])
             .output()
             .unwrap();
         assert!(help.status.success());
         let text = String::from_utf8(help.stdout).unwrap();
         assert!(
-            text.contains(&format!("default: {default}")),
+            text.contains(&format!("Default: {default}")),
             "{command}: {text}"
         );
         for format in accepted {

@@ -12,108 +12,17 @@ use cheriot_compose::{
     render,
 };
 use command_name::CommandName;
+use help::{command_help, general_help};
 use option_catalog::OutputFormat;
 use options::Options;
 
 mod audit;
 mod command_name;
+mod help;
 mod option_catalog;
 mod options;
 mod progress;
 mod size;
-
-const HELP: &str = "Usage: cheriot-compose <command> [OPTION]...
-
-Inspect and build CHERIoT firmware from TOML configuration.
-
-Commands:
-  check                         Validate without running tools
-  configuration                 Show resolved configuration
-  plan                          Complete clean-build plan
-  compare-compilation-database  Compare compiler commands
-  build                         Build the selected firmware
-  run                           Build and run the selected firmware
-  explain OPERATION-ID          Show one operation and its origins
-  clean                         Remove this plan's output files
-  audit --query QUERY           Build firmware and run an independent audit
-  package                       Build firmware and its board-specific package
-  size [--compartment NAME]     Report the SDK-style section size
-  analyze-switcher --input FILE  Check annotated switcher control flow and output DOT
-  help [command]                Show help
-  version                       Show the version
-
-";
-
-fn general_help() -> String {
-    let mut text = format!("{HELP}\nCommon options:\n");
-    for option in option_catalog::OPTIONS
-        .iter()
-        .filter(|option| option.commands.len() >= 5 || option.name == "--help")
-    {
-        text.push_str(&format!(
-            "  {:<25} {}\n",
-            option.label(),
-            option.description
-        ));
-    }
-    text.push_str("\nOptions follow the command. Use cheriot-compose COMMAND --help for its usage.\nCompiler probes remain unresolved until a build or an explicit probe.\n");
-    text
-}
-
-fn command_help(command: &str) -> Result<String> {
-    let selected = CommandName::parse(command).ok_or_else(|| {
-        Diagnostic::new(format!(
-            "unknown command {command}; use cheriot-compose help"
-        ))
-    })?;
-    let positional = if selected == CommandName::Explain {
-        " OPERATION-ID"
-    } else {
-        ""
-    };
-    let trailing = if selected == CommandName::Run {
-        " [-- RUNNER-ARGS...]"
-    } else {
-        ""
-    };
-    let mut text =
-        format!("Usage: cheriot-compose {command}{positional} [OPTION]...{trailing}\n\nOptions:\n");
-    for option in option_catalog::OPTIONS
-        .iter()
-        .filter(|option| option_catalog::accepts(selected, option.name))
-    {
-        text.push_str(&format!(
-            "  {:<25} {}\n",
-            option.label(),
-            option.description
-        ));
-    }
-    let formats = option_catalog::formats(selected);
-    if !formats.supported.is_empty() {
-        let supported = formats
-            .supported
-            .iter()
-            .map(|format| format.name())
-            .collect::<Vec<_>>()
-            .join(", ");
-        text.push_str(&format!(
-            "\nFormats: {supported} (default: {}).\n",
-            formats.default.name()
-        ));
-    }
-    if matches!(selected, CommandName::Build | CommandName::Package) {
-        text.push_str("\n--output requires --format json; --verbose and --quiet cannot be combined with JSON output.\n");
-    }
-    if selected == CommandName::Audit {
-        text.push_str("\n--output cannot be combined with --dry-run.\n");
-    }
-    if selected == CommandName::CompareCompilationDatabase {
-        text.push_str(
-            "\n--generated compares a file and cannot be combined with project options.\n",
-        );
-    }
-    Ok(text)
-}
 
 pub(crate) fn execute_cli() -> Result<i32> {
     let Some(arguments) = Options::parse()? else {
@@ -224,7 +133,7 @@ fn compare_compilation_databases(arguments: &Options) -> Result<(String, i32)> {
     let reference_path = arguments
         .reference_database
         .as_ref()
-        .ok_or_else(|| Diagnostic::new("compare-compilation-database needs --against FILE"))?;
+        .ok_or_else(|| Diagnostic::new("compare-compilation-db needs --against FILE"))?;
     let reference = compilation_database::read_compilation_database(reference_path)?;
     let actual = if let Some(path) = &arguments.generated_database {
         compilation_database::read_compilation_database(path)?

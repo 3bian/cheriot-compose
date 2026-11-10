@@ -17,7 +17,18 @@ kind = "compartment"
 name = "producer-consumer"
 libraries = ["freestanding", "message_queue", "debug"]
 services = ["producer", "consumer"]
-threads = [
-    { compartment = "producer", entry = "run", name = "producer-main", priority = 1, stack_size = 0x500, trusted_stack_frames = 5 },
-    { compartment = "consumer", entry = "run", name = "consumer-main", priority = 1, stack_size = 0x500, trusted_stack_frames = 3 },
-]
+[[firmwares.threads]]
+name = "producer-main"
+compartment = "producer"
+entry = "run"
+priority = 1
+stack_size = 0x500
+trusted_stack_frames = 5
+
+[[firmwares.threads]]
+name = "consumer-main"
+compartment = "consumer"
+entry = "run"
+priority = 1
+stack_size = 0x500
+trusted_stack_frames = 3

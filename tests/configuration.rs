@@ -228,7 +228,7 @@ fn core_component_roles_are_explicit_and_reserved() {
 fn dense_priorities_and_zero_threads() {
     let fixture = TestFixture::new();
     let original = std::fs::read_to_string(fixture.project_file()).unwrap();
-    let prefix = original.split("threads = [").next().unwrap();
+    let prefix = original.split("[[firmwares.threads]]").next().unwrap();
     let mut definitions = String::new();
     for (index, priority) in [2, 5, 5, 9].into_iter().enumerate() {
         definitions.push_str(&format!("{{ name = \"thread{index}\", compartment = \"producer\", entry = \"run\", priority = {priority}, stack_size = 512, trusted_stack_frames = 1 }},\n"));

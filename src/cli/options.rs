@@ -99,27 +99,9 @@ impl Options {
                 "put the command first, for example: cheriot-compose build --toolchain-dir /cheriot-tools/bin --file project.toml",
             ));
         }
-        if command_name == "help" {
-            if let Some(command) = arguments.next() {
-                if arguments.next().is_some() {
-                    return Err(Diagnostic::new("help accepts at most one command"));
-                }
-                print!("{}", command_help(&command)?);
-            } else {
-                print!("{}", general_help());
-            }
-            return Ok(None);
-        }
-        if command_name == "version" {
-            if arguments.next().is_some() {
-                return Err(Diagnostic::new("version does not take options"));
-            }
-            println!("cheriot-compose {}", env!("CARGO_PKG_VERSION"));
-            return Ok(None);
-        }
         let parsed_command = CommandName::parse(&command_name).ok_or_else(|| {
             Diagnostic::new(format!(
-                "unknown command {command_name}; use cheriot-compose help"
+                "unknown command {command_name}; use cheriot-compose --help"
             ))
         })?;
         let mut file = None;
@@ -165,12 +147,12 @@ impl Options {
             }
             let option = option_catalog::find(&argument).ok_or_else(|| {
                 Diagnostic::new(format!(
-                    "unexpected argument {argument}; use cheriot-compose help {command_name}"
+                    "unexpected argument {argument}; use cheriot-compose {command_name} --help"
                 ))
             })?;
             if !option.commands.contains(&parsed_command) {
                 return Err(Diagnostic::new(format!(
-                    "{argument} is not valid for {command_name}; use cheriot-compose help {command_name}"
+                    "{argument} is not valid for {command_name}; use cheriot-compose {command_name} --help"
                 )));
             }
             if option.name == "--help" {

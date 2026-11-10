@@ -1,322 +1,310 @@
-# cheriot-compose
+# CHERIoT Compose
 
-`cheriot-compose` builds CHERIoT firmware from TOML projects. It checks
-configuration, shows build plans, builds firmware and can run it on a configured
-simulator or board.
+## Command Line Arguments
 
-## Command-Line Reference
+`cheriot-compose` builds CHERIoT firmware from TOML project files. It validates
+configuration, shows build commands, compiles firmware and can launch the result
+on a configured simulator or board.
 
-### Command-Line Options
-
-#### Common Commands
-
-Run these commands from the root of an RTOS checkout after installing Compose,
-copying its integration into the checkout and installing the CHERIoT compiler.
-The walkthrough below explains each step. These examples use the compiler at
-`~/cheriot-tools/bin`; replace it with your own executable directory if needed.
-Compose's built-in default is `/cheriot-tools/bin`. The `run` command also needs
-the board's runner installed.
+Put the command before its options. Use `--help` or `-h` on its own for general
+help, or after a command for that command's help:
 
 ```sh
-# Check a project without running the compiler.
-cheriot-compose check --toolchain-dir "/cheriot-tools/bin" --project hello-world
-
-# Build an example.
-cheriot-compose build --toolchain-dir "/cheriot-tools/bin" --project hello-world
-
-# Build the default RTOS test firmware.
-cheriot-compose build --toolchain-dir "/cheriot-tools/bin" --project tests --board sail --mode release --jobs 4
-
-# Inspect the complete build plan.
-cheriot-compose plan --toolchain-dir "/cheriot-tools/bin" --project tests --format json
-
-# Build or reuse the example and start its configured runner.
-cheriot-compose run --toolchain-dir "/cheriot-tools/bin" --project hello-world
+cheriot-compose --help
+cheriot-compose build --help
+cheriot-compose run -h
 ```
 
-#### Command Overview
+The general help shows the available commands and common options:
 
-The command comes first, followed by its options. The `help` and `version`
-commands work without a project or compiler. Use `help` with a command name,
-or put `--help` after a command, to see its options.
+```text
+Usage: cheriot-compose COMMAND [OPTION]...
 
-| Command | Purpose |
-| --- | --- |
-| `analyze-switcher` | Analyze annotated switcher assembly. |
-| `audit` | Run an audit after building. |
-| `build` | Build the selected firmware. |
-| `check` | Validate a project or every project in a workspace. |
-| `clean` | Remove files owned by the selected build. |
-| `compare-compilation-database` | Compare compiler commands, with optional path mappings. |
-| `configuration` | Show the resolved configuration; use `--format json` for JSON. |
-| `explain` | Explain an operation in the build plan. |
-| `help` | Show help. |
-| `package` | Build and create the selected board's package. |
-| `plan` | Show the complete clean-build plan in text, JSON, shell or compilation-database format. |
-| `run` | Build if needed, then start the board's configured runner. |
-| `size` | Report firmware or compartment size. |
-| `version` | Show the application version. |
+Inspect and build CHERIoT firmware from TOML configuration.
 
-For project commands, `--file` selects a project or workspace, `--project`
-selects a project in a workspace, and `--firmware` selects an image when a
-project defines more than one. Repeat `--overlay` to apply configuration changes
-in order. `--board` and `--mode` select a board and build mode. Build-related
-commands accept `--jobs`, `--verbose`, `--quiet` and `--dry-run` as shown in
-their command-specific help.
+Commands:
+  analyze-switcher --input FILE
+    Check annotated switcher assembly and produce a DOT graph.
 
-## Source-Build Walkthrough
+  audit --query QUERY
+    Build firmware and run an independent audit.
 
-This Linux/POSIX-shell walkthrough installs CHERIoT LLVM and the Compose host
-application, then builds the RTOS test firmware. It needs Git, a working host
-C/C++ compiler and build tools, CMake, Ninja, Python 3.8 or later, and Rust 1.89 or later
-with Cargo. Python is used by the LLVM build; Compose itself is written in Rust.
-A simulator is optional and is needed only to run the firmware.
+  build
+    Build the selected firmware.
 
-On Ubuntu or Debian, install the non-Rust host prerequisites with:
+  check
+    Validate configuration without running compiler tools.
 
-```sh
-sudo apt update
-sudo apt install build-essential ca-certificates cmake curl git ninja-build python3
+  clean
+    Remove files recorded as belonging to the selected build.
+
+  compare-compilation-db
+    Compare compiler commands against a reference database.
+
+  configuration
+    Show the resolved configuration.
+
+  explain OPERATION-ID
+    Show a build operation and the origins of its inputs.
+
+  package
+    Build firmware and create its board-specific package.
+
+  plan
+    Show the complete clean-build plan.
+
+  run
+    Build as needed, then launch the configured runner.
+
+  size [--compartment NAME]
+    Report firmware or compartment section sizes.
+
+Options follow the command. Available options and formats vary by command.
+Use cheriot-compose COMMAND --help for its complete usage and restrictions.
+Compiler probes remain unresolved until a build or an explicit probe.
+
+Common options:
+  --board BOARD
+    Select a board name or TOML file.
+
+  --build-dir DIR
+    Select the root directory for intermediate build files.
+
+  --dry-run
+    Describe the work needed without executing it.
+
+  -f, --file FILE
+    Select a project or workspace manifest.
+
+  --firmware NAME
+    Select a firmware image.
+
+  --format FORMAT
+    Select an output format supported by the command.
+
+  --jobs NUMBER
+    Limit the number of parallel build jobs.
+
+  --mode debug|release
+    Select the build mode.
+
+  --output FILE
+    Write the command's text or structured output to a file.
+
+  --output-dir DIR
+    Select the destination for final firmware files.
+
+  --overlay FILE
+    Apply a project overlay; repeat to apply overlays in order.
+
+  --project NAME
+    Select a project from a workspace.
+
+  --quiet
+    Hide routine build progress.
+
+  --toolchain-dir DIR
+    Select the directory containing LLVM executables.
+
+  --verbose
+    Show commands and reasons for rebuilding.
+
+  -h, --help
+    Display this help and exit.
 ```
 
-The CHERIoT LLVM `cheriot` branch requires CMake 3.20 or later at the revision
-checked for this guide; its build warns that future LLVM versions will require
-3.31 or later. Check `cmake --version` and install a suitable newer CMake if
-your distribution's package is too old. The branch can change, so check its
-build messages if using a newer checkout.
+A command's help lists only the options it accepts, its output formats and any
+restrictions. Help works without a project, compiler or simulator.
 
-### Choose Directories
+### Common Arguments
 
-Set these shell variables once. They make the commands easier to read; they are
-not Compose configuration settings. You can choose different absolute paths,
-including existing checkouts. The directories do not have to be siblings.
-Clone only repositories that are not already present at your chosen paths.
+`--file FILE` selects a project or workspace manifest. Within a workspace,
+`--project NAME` selects a project; `--firmware NAME` selects an image when a
+project defines several. Without `--file` or an environment override, Compose
+reads `cheriot-compose.toml` in the working directory. It does not search parent
+directories.
+
+`--board BOARD` selects a board name or TOML file. `--mode debug|release`
+selects the build mode; release is the default. Repeat `--overlay FILE` to
+apply configuration patches in the given order.
+
+`--toolchain-dir DIR` selects the directory containing CHERIoT LLVM
+executables. For the installation below, use `"$CHERIOT_TOOLS/bin"`.
+Compose does not append `bin` or substitute a host LLVM installation from
+`PATH`. The built-in default is `/cheriot-tools/bin`.
+
+Build-related commands accept `--jobs NUMBER` to limit parallel work; the
+default is one job. `--verbose` shows commands and rebuild reasons,
+`--quiet` hides routine progress, and `--dry-run` describes needed work
+without executing it. Verbose and quiet cannot be combined.
+
+`--output-dir DIR` selects the final firmware destination, while
+`--build-dir DIR` selects intermediate storage. `--output FILE` instead
+writes a command's textual or structured output. For `build` and `package`,
+`--output` requires `--format json`; JSON build output cannot be combined
+with `--verbose` or `--quiet`.
+
+### Common Commands
+
+After completing the Build section, these commands use the prepared RTOS
+workspace and the home-directory compiler installation:
 
 ```sh
+cd "$CHERIOT_RTOS"
+
+# Validate a project without running the compiler.
+cheriot-compose check --project hello-world
+
+# Inspect the commands a complete build would require.
+cheriot-compose plan --project hello-world \
+  --toolchain-dir "$CHERIOT_TOOLS/bin"
+
+# Build the example for Sail.
+cheriot-compose build --project hello-world \
+  --toolchain-dir "$CHERIOT_TOOLS/bin" \
+  --board sail --mode release --jobs 1
+
+# Build the usual RTOS test selection.
+cheriot-compose build --project tests \
+  --toolchain-dir "$CHERIOT_TOOLS/bin" \
+  --board sail --mode release --jobs 1
+```
+
+Use `--file "$CHERIOT_RTOS/cheriot-compose.toml"` to select the same workspace
+from another directory. A successful check establishes that the selected
+configuration and required inputs are valid; a firmware build checks the
+compiler workflow, and a run checks execution on the selected target.
+
+## Build
+
+This README assumes the repository root is $HOME/cheriot-compose, with
+Cargo.toml, integrations and templates directly inside it. Place this checkout
+there before running the commands.
+
+Use this fresh-install recipe on Debian or Ubuntu with the default
+[Rustup](https://rustup.rs/) and Cargo locations. It needs sudo, network access,
+CMake 3.20 or newer, Python 3.8 or newer, and LLD 11 or newer. Building LLVM
+takes substantial time and disk space.
+
+Skip installation or clone commands for components you already have.
+Initialise submodules in an existing RTOS checkout before continuing.
+The integration copy replaces matching files in that checkout.
+
+The block installs Compose, builds the CHERIoT compiler, adds the project
+manifests to RTOS, and builds hello-world for the Sail board.
+
+```bash
+set -euo pipefail
+
 export CHERIOT_COMPOSE="$HOME/cheriot-compose"
 export CHERIOT_LLVM="$HOME/cheriot-llvm"
 export CHERIOT_RTOS="$HOME/cheriot-rtos"
 export CHERIOT_TOOLS="$HOME/cheriot-tools"
-```
 
-### Build and Install CHERIoT LLVM
+# Install host build tools.
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+  build-essential ca-certificates clang cmake curl git lld python3
 
-An ordinary host LLVM installation cannot compile CHERIoT firmware. For a new
-checkout, obtain the CHERIoT branch of the
-[CHERIoT LLVM repository](https://github.com/CHERIoT-Platform/llvm-project/tree/cheriot):
+# Clone the RTOS and its submodules.
+git clone --recurse-submodules \
+  https://github.com/CHERIoT-Platform/cheriot-rtos.git "$CHERIOT_RTOS"
 
-```sh
-git clone \
-  --branch cheriot \
-  --depth 1 \
-  --single-branch \
-  https://github.com/CHERIoT-Platform/llvm-project.git \
-  "$CHERIOT_LLVM"
-```
+# Clone the LLVM sources needed for the low-memory build.
+git -c checkout.workers=1 -c index.threads=1 -c pack.threads=1 \
+  clone --branch cheriot --depth 1 --filter=blob:none --single-branch --sparse \
+  https://github.com/CHERIoT-Platform/llvm-project.git "$CHERIOT_LLVM"
 
-For an existing suitable checkout, set `CHERIOT_LLVM` to its location and skip
-the clone. Configure and install the compiler, linker and LLVM utilities:
+git -C "$CHERIOT_LLVM" \
+  -c checkout.workers=1 -c index.threads=1 -c pack.threads=1 \
+  sparse-checkout set --cone clang cmake libc libunwind lld llvm third-party
 
-```sh
-cmake \
-  -S "$CHERIOT_LLVM/llvm" \
-  -B "$CHERIOT_LLVM/build" \
-  -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX="$CHERIOT_TOOLS" \
-  -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld" \
-  -DLLVM_ENABLE_UNWIND_TABLES=OFF \
-  -DLLVM_TARGETS_TO_BUILD=RISCV \
-  -DLLVM_DISTRIBUTION_COMPONENTS="clang;clangd;lld;llvm-objdump;llvm-objcopy"
-
-cmake \
-  --build "$CHERIOT_LLVM/build" \
-  --target install-distribution \
-  --parallel 4
-```
-
-LLVM is a substantial build. Reduce `--parallel 4` if memory is limited. Check
-the installed executables:
-
-```sh
-"$CHERIOT_TOOLS/bin/clang" --version
-"$CHERIOT_TOOLS/bin/clang++" --version
-"$CHERIOT_TOOLS/bin/ld.lld" --version
-"$CHERIOT_TOOLS/bin/llvm-objdump" --version
-```
-
-`CHERIOT_TOOLS` is the installation prefix. `"$CHERIOT_TOOLS/bin"` is the
-executable directory passed to `--toolchain-dir`; Compose does not append `bin`.
-The LLVM source and build directories are separate from this installed
-directory. Compose's built-in default remains `/cheriot-tools/bin`.
-
-A version check confirms that an executable can run. The firmware build below
-checks that the selected tools support the compilation workflow.
-Some board-packaging workflows also need `llvm-strip`; the Sail test build does
-not. Install that utility as well if a selected packaging plan requires it.
-
-### Prepare the RTOS Sources
-
-For a new checkout, clone [CHERIoT RTOS](https://github.com/CHERIoT-Platform/cheriot-rtos)
-and its submodules:
-
-```sh
-git clone \
-  --recurse-submodules \
-  https://github.com/CHERIoT-Platform/cheriot-rtos.git \
-  "$CHERIOT_RTOS"
-```
-
-For an existing checkout, set `CHERIOT_RTOS` to that directory and initialize
-its submodules without replacing or resetting it:
-
-```sh
-git -C "$CHERIOT_RTOS" submodule update --init --recursive
-```
-
-No particular checkout name, location, branch or revision is required by this
-walkthrough. Compose checks the SDK files and capabilities needed by the
-selected project. If it reports a missing dependency, provide the reported
-requirement in that checkout.
-
-### Install Rust and Compose
-
-Install host Rust 1.89 or later and Cargo if they are not already available.
-The following uses the [official rustup installation method](https://rustup.rs/):
-
-```sh
+# Install Rust and load its environment.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs |
-  sh -s -- --profile minimal
+  sh -s -- -y --profile minimal
 . "$HOME/.cargo/env"
-rustc --version
-cargo --version
-```
 
-For a new Compose checkout, clone this repository:
+# Build and install Compose.
+cd "$CHERIOT_COMPOSE"
+cargo install --locked --path . --jobs 1
 
-```sh
-git clone \
-  https://github.com/adam-3bian/cheri-make.git \
-  "$CHERIOT_COMPOSE"
-```
+# Build and install the CHERIoT compiler.
+cmake -S "$CHERIOT_LLVM/llvm" \
+  -B "$CHERIOT_LLVM/build-lowmem" \
+  -G "Unix Makefiles" \
+  -DCLANG_ENABLE_CIR=OFF \
+  -DCLANG_ENABLE_OBJC_REWRITER=OFF \
+  -DCLANG_ENABLE_STATIC_ANALYZER=OFF \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+  -DCMAKE_CXX_FLAGS="" \
+  -DCMAKE_CXX_FLAGS_RELEASE="-O1 -DNDEBUG" \
+  -DCMAKE_C_COMPILER=/usr/bin/clang \
+  -DCMAKE_C_FLAGS="" \
+  -DCMAKE_C_FLAGS_RELEASE="-O1 -DNDEBUG" \
+  -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=lld -Wl,--threads=1" \
+  -DCMAKE_INSTALL_PREFIX="$CHERIOT_TOOLS" \
+  -DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=lld -Wl,--threads=1" \
+  -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=lld -Wl,--threads=1" \
+  -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers;lld;llvm-objdump;llvm-objcopy;llvm-strip" \
+  -DLLVM_ENABLE_ASSERTIONS=OFF \
+  -DLLVM_ENABLE_LTO=OFF \
+  -DLLVM_ENABLE_PROJECTS="clang;lld" \
+  -DLLVM_ENABLE_RUNTIMES="" \
+  -DLLVM_ENABLE_THREADS=OFF \
+  -DLLVM_ENABLE_UNWIND_TABLES=OFF \
+  -DLLVM_INCLUDE_BENCHMARKS=OFF \
+  -DLLVM_INCLUDE_DOCS=OFF \
+  -DLLVM_INCLUDE_EXAMPLES=OFF \
+  -DLLVM_INCLUDE_RUNTIMES=OFF \
+  -DLLVM_INCLUDE_TESTS=OFF \
+  -DLLVM_TARGETS_TO_BUILD=RISCV \
+  -DLLVM_USE_LINKER=lld
 
-For an existing checkout, set `CHERIOT_COMPOSE` to its location and skip the clone.
-Build and install the host application from its product directory:
+cmake --build "$CHERIOT_LLVM/build-lowmem" \
+  --parallel 1 --target install-distribution
 
-```sh
-cd "$CHERIOT_COMPOSE/cheriot-compose"
-cargo install --locked --path .
-```
+"$CHERIOT_TOOLS/bin/clang" --version
 
-Cargo installs `cheriot-compose` in its binary directory, normally
-`$HOME/.cargo/bin`. Make sure that directory is on `PATH`; sourcing
-`"$HOME/.cargo/env"` as above sets up the usual rustup installation. Host Rust
-builds Compose. Optional Rust firmware needs a separate CHERIoT-capable Rust
-compiler; the default RTOS test selection below does not need one.
+# Add the Compose manifests to the RTOS checkout.
+cp -a "$CHERIOT_COMPOSE/integrations/cheriot-rtos/." "$CHERIOT_RTOS/"
 
-### Install the RTOS Integration
-
-Copy the **contents** of the integration directory into the RTOS root:
-
-```sh
-cp -R \
-  "$CHERIOT_COMPOSE/cheriot-compose/integrations/cheriot-rtos/." \
-  "$CHERIOT_RTOS/"
-```
-
-The trailing `/.` copies the contents while preserving their directory layout.
-These TOML files configure the workspace, projects, SDK components and boards.
-The installed Compose executable supplies its templates and does not require its
-source checkout at runtime. The original `xmake.lua` files remain in the RTOS
-checkout; Compose reads the accompanying `cheriot-compose.toml` files.
-
-### Check and Build the Test Firmware
-
-The following commands can run from any working directory because `--file`
-selects the RTOS workspace explicitly. The workspace project selector is
-`tests`. Check its configuration and required SDK inputs without running the
-compiler:
-
-```sh
-cheriot-compose check \
-  --toolchain-dir "$CHERIOT_TOOLS/bin" \
-  --file "$CHERIOT_RTOS/cheriot-compose.toml" \
-  --project tests
-```
-
-Build the Sail release firmware:
-
-```sh
+# Build hello-world for the Sail board.
+cd "$CHERIOT_RTOS"
 cheriot-compose build \
   --toolchain-dir "$CHERIOT_TOOLS/bin" \
   --file "$CHERIOT_RTOS/cheriot-compose.toml" \
-  --project tests \
+  --project hello-world \
   --board sail \
   --mode release \
-  --jobs 4
+  --jobs 1
 ```
 
-This compiles the RTOS components needed by the selected firmware and links
-them with the test application. Normal output shows progress and final paths.
-For commands and rebuild reasons, repeat the build with `--verbose`:
+The LLVM sources and build directory are separate from the installed tools.
+The build uses one compilation job and one host-linker thread. Disabling LLVM
+threading affects the generated tools separately. Keep libc, libunwind and
+third-party in the sparse checkout: the build needs their headers.
 
-```sh
-cheriot-compose build \
-  --toolchain-dir "$CHERIOT_TOOLS/bin" \
-  --file "$CHERIOT_RTOS/cheriot-compose.toml" \
-  --project tests \
-  --board sail \
-  --mode release \
-  --jobs 4 \
-  --verbose
-```
+Cargo uses the Rust toolchain selected by this repository. The installed
+application is available through Cargo's bin directory.
 
-A successful default build produces firmware and a compartment report:
+The build writes hello_world.elf and hello_world.json under
+$CHERIOT_RTOS/examples/01.hello_world. To execute that firmware, install the
+Sail runner as described under Runners and the VM below. Compose itself can be installed
+without building LLVM by running the Cargo installation command in the
+repository root.
 
-```text
-$CHERIOT_RTOS/tests/test-suite.elf
-$CHERIOT_RTOS/tests/test-suite.json
-```
+## Features
 
-The JSON file is the compartment report. Final files go beside the selected
-project manifest, even when the workspace manifest was selected from another
-working directory. Intermediates and build state are kept at:
+### TOML Projects and Firmware
 
-```text
-$CHERIOT_RTOS/tests/.cheriot-compose/sail/cheriot/release/
-```
+A project describes its SDK, board, components and firmware images. A service
+is a compartment; its threads are declared separately within a firmware.
+Libraries and component dependencies provide reusable code.
 
-The shipped `most_tests` selection excludes optional configurations such as
-Rust and bigdata. Building this default selection does not build every possible
-test configuration. A successful firmware build completes the walkthrough; it
-does not execute the tests.
-
-### Optional: Run the Tests
-
-Building does not require a simulator. To run this Sail configuration, install
-`cheriot_sim` separately and make it available on `PATH`, then run:
-
-```sh
-cheriot-compose run \
-  --toolchain-dir "$CHERIOT_TOOLS/bin" \
-  --file "$CHERIOT_RTOS/cheriot-compose.toml" \
-  --project tests \
-  --board sail \
-  --mode release
-```
-
-`run` builds or reuses the firmware and starts the configured runner. The
-compiler directory option does not install or find an unavailable simulator.
-Runner arguments after `--` are passed as separate arguments. Other boards may
-need a different simulator, hardware or board-specific preparation.
-
-## Project Configuration
-
-A small project beside `hello.cc` can use the RTOS SDK and its component
-catalogue. Adjust the relative `sdk`, `board` and `include` paths to match your
-checkout. A service is a compartment; its thread is declared separately.
-Independent keys are alphabetised in each table, with `name` first; array
-entries retain their intended order.
+For example, this manifest can sit beside `hello.cc` in
+`$CHERIOT_RTOS/examples/01.hello_world/`, after the Compose integration has
+been copied into the RTOS checkout:
 
 ```toml
 name = "hello-world"
@@ -345,119 +333,223 @@ stack_size = 512
 trusted_stack_frames = 1
 ```
 
-The entry point must exist in the source file. `cheriot-compose.toml` in the
-working directory is used by default. `--file` takes precedence over
-`CHERIOT_COMPOSE_FILE`, which takes precedence over that default. Compose does
-not search parent directories.
+The `say_hello` entry point must exist in the compartment's source. Adjust
+SDK, board and include paths when placing the project elsewhere. Paths are
+resolved from the file declaring them, so moving the manifest can change their
+meaning.
 
-## Includes, Overlays and Environment
+Keep independent keys alphabetised within each table, with `name` first;
+preserve the intended order of array entries.
 
-Includes combine reusable declarations. Their paths, and paths declared inside
-them, are relative to the file containing each declaration. Duplicate definitions
-and include cycles are errors. Repeat `--overlay` for deliberate patches, in
-order; each overlay can add, replace or remove a field. Board files support
-inheritance and ordered board patches too.
+A workspace lists named project manifests under `[workspace.projects]`.
+The RTOS integration supplies projects including `hello-world`,
+`producer-consumer` and `tests`. Selecting a workspace project does not
+change that project's source directory or default output location.
 
-For example, this excerpt can be saved as an overlay named `debug.toml`:
+The format has no schema declaration. Unknown fields, duplicate definitions,
+missing component dependencies and invalid references are reported as errors.
+Capability checks also identify SDK files required by the selected components;
+they do not establish compatibility with every possible SDK revision or board.
+
+### Includes, Overlays and Boards
+
+Use `include` to combine reusable declarations. Included files retain their
+own path bases, and include cycles are errors. Use overlays for deliberate
+changes to existing configuration rather than duplicating an entire project.
+
+An overlay contains ordered patches. Each patch uses `add`, `replace` or
+`remove` and a JSON-pointer path; replacing or removing a missing field is
+an error. For example, save this as `debug.toml` in the RTOS workspace:
 
 ```toml
 patches = [{ op = "add", path = "/mode", value = "debug" }]
 ```
 
-Apply it from the RTOS workspace. Use the same destination when running it:
+Apply the overlay and choose a separate destination:
 
 ```sh
-cheriot-compose build --toolchain-dir "/cheriot-tools/bin" --project hello-world --overlay debug.toml --output-dir ./debug-dist
-cheriot-compose run --toolchain-dir "/cheriot-tools/bin" --project hello-world --overlay debug.toml --output-dir ./debug-dist
+cd "$CHERIOT_RTOS"
+cheriot-compose build --project hello-world \
+  --toolchain-dir "$CHERIOT_TOOLS/bin" \
+  --overlay debug.toml --output-dir ./debug-dist
 ```
 
-The separate output directory keeps the debug files alongside an existing
-release build without replacing it.
+Use the same overlay and destination when running that build. Multiple
+`--overlay` arguments are applied in order. Board files can inherit another
+board with `extends` and apply ordered patches; projects can supply
+`board_overlays` for board-specific changes.
 
-The LLVM directory is selected by `--toolchain-dir`, then
-`CHERIOT_COMPOSE_TOOLCHAIN_DIR`, then `toolchain_dir` in project TOML, and
-finally `/cheriot-tools/bin`. This directory contains `clang`, `clang++`,
-`ld.lld` and the LLVM utilities directly; Compose does not add another `bin`.
-`CC`, `CXX`, `LD`, `OBJDUMP`, `OBJCOPY` and `STRIP` do not select these tools,
-although child programs inherit the environment normally. Explicit component or
-source compiler selections remain available in configuration.
+Named boards come from the selected SDK's `boards/` directory. A board
+defines the firmware's memory, devices, clock rates, driver includes and
+optional runner or packaging settings. Choose a board that matches the target
+on which the firmware will execute.
 
-`--build-dir` / `CHERIOT_COMPOSE_BUILD_DIR` / `build_dir` select intermediate
-storage, and `--output-dir` / `CHERIOT_COMPOSE_OUTPUT_DIR` / `output_dir` select
-final output. Command-line settings override environment settings, which
-override TOML. Relative command-line and environment paths start at the working
-directory; TOML paths start at the file declaring them. Explicit interpolation
-such as `toolchain_dir = "${env:TOOLS_DIRECTORY}"` retains that TOML path base
-and reports a missing variable. No shell expansion or implicit environment file
-is used.
+### Environment and Tool Selection
 
-For Rust firmware, set `toolchain.rust_compiler` in project TOML or set `RUSTC`.
-`toolchain.cargo` selects host Cargo and `toolchain.uf2_converter` selects the
-packaging utility when required.
+Command-line choices take precedence over environment settings, which take
+precedence over project TOML. The supported overrides include
+`CHERIOT_COMPOSE_FILE`, `CHERIOT_COMPOSE_BOARD`,
+`CHERIOT_COMPOSE_MODE`, `CHERIOT_COMPOSE_TOOLCHAIN_DIR`,
+`CHERIOT_COMPOSE_BUILD_DIR`, `CHERIOT_COMPOSE_OUTPUT_DIR` and
+`CHERIOT_COMPOSE_JOBS`.
 
-## Output Files and Other Workflows
+Relative command-line and direct environment paths start at the invocation
+directory. TOML paths start at their declaring file. Explicit TOML
+interpolation, such as `toolchain_dir = "${env:CHERIOT_TOOLS}/bin"`,
+is supported and reports a missing variable. Interpolation retains the TOML
+path base if its result is relative. There is no implicit environment file or
+shell expansion.
 
-By default, final `<firmware>.elf` and `<firmware>.json` files appear beside the
-selected project manifest, even when it is selected through a workspace. The
-JSON is the compartment report; a firmware can explicitly disable it with
-`compartment_report = false`. `--output-dir` names the exact final destination.
+The LLVM selection order is `--toolchain-dir`,
+`CHERIOT_COMPOSE_TOOLCHAIN_DIR`, project `toolchain_dir`, then
+`/cheriot-tools/bin`. The selected directory supplies `clang`, `clang++`,
+`ld.lld`, `llvm-objdump`, `llvm-objcopy` and `llvm-strip`; execution
+checks each tool when an action needs it.
 
-Intermediate files and incremental build state are kept under
-`<project>/.cheriot-compose/<board>/cheriot/<mode>/` by default. `--build-dir`
-changes the intermediate root. Changing only the output destination can reuse
-intermediates. Clean removes recorded files owned by the build, not unrelated
-files in the output directory.
+Generic `CC`, `CXX`, `LD`, `OBJDUMP`, `OBJCOPY` and `STRIP`
+do not select that suite, although child processes inherit the environment.
+Explicit compiler choices for individual components and sources remain
+available.
 
-Normal builds show progress and final paths. `--verbose` adds commands and
-rebuild reasons; `--quiet` hides routine progress but keeps errors. JSON build
-output is available with `--format json`. A plan is a complete clean build;
-`build --dry-run` describes work currently needed. Checks and plans do not run
-the compiler unless a supported explicit probe is requested.
+### Outputs and Incremental Builds
 
-Plan formats include `json`, `shell` and `compilation-database`. The shell
-export shows the actual generation, compiler and linker steps. An audit needs
-an audit tool and policy; packaging needs the selected board's packaging tools.
-Compilation database comparison accepts `--against` and repeatable `--map-path`
-for relocated paths. Switcher analysis accepts assembly input and does not need
-a project. See each command's help for its supported options.
+By default, final `<firmware>.elf` and `<firmware>.json` files appear beside
+the selected project manifest, including when the project is selected through
+a workspace. The JSON file is a compartment report. A firmware can disable it
+with `compartment_report = false`.
 
-For `cheriot-vm`, install `cheriot-vm` and copy both its RTOS driver integration
-and the separate Compose VM integration into the RTOS checkout. Select the
-`cheriot-vm` board and a compatible VM profile with `--vm-profile`; firmware,
-board devices and profile must agree.
+The hello-world project produces `hello_world.elf` and `hello_world.json`
+under `$CHERIOT_RTOS/examples/01.hello_world/`. The RTOS test project produces
+`test-suite.elf` and `test-suite.json` under `$CHERIOT_RTOS/tests/`.
 
-## Troubleshooting
+Intermediate files and incremental state are stored under
+`<project>/.cheriot-compose/<board>/cheriot/<mode>/`. Moving only the final
+output destination can reuse existing intermediates. Repeated builds reuse
+up-to-date work; `--verbose` explains why an operation runs again.
+`clean` removes recorded build files while preserving unrelated files.
 
-- Missing compiler: point `--toolchain-dir` at the directory containing the
-  executables. A plan or check can still run without them.
-- Missing SDK file or capability: check the project `sdk` path and initialize
-  the relevant RTOS submodules if the selected components need them.
-- Ambiguous project or firmware: select one of the listed names with `--project`
-  or `--firmware`.
-- Unexpected rebuild: use `--verbose` for the reason, or `explain` for an
-  operation's inputs and origins.
-- Runner failure: check that the board's runner is installed and its profile
-  matches the firmware and devices.
+A plan describes a complete clean build. By contrast, `build --dry-run`
+describes the work needed in the current state. Checks and ordinary plans do
+not run the compiler. Compiler-dependent probes remain unresolved until a
+build or an explicit `--probe-toolchain` request on a supported command.
 
-## Verification and Limitations
+### Runners and the VM
 
-From the Compose product directory, `cargo test --locked --all-targets` runs
-host-side Compose tests without an RTOS checkout or CHERIoT compiler. Add
-`--features host-tool-verification` for tests that use a POSIX shell and
-standard utilities. Repository-reference checks use `rtos-verification`, which
-includes the host-tool tests and needs the complete repository. These host tests
-check the build tool; they are separate from the RTOS firmware tests above.
-The recorded host checks use stable Rust 1.99.1 and the minimum Rust 1.89.0.
+`run` performs the necessary build and then invokes the selected board's
+runner, even when the firmware was already up to date. The runner executable
+must be installed and discoverable through its configured path or `PATH`.
+A successful build alone does not mean the firmware has been executed.
 
-The RTOS test suite has been built and run on Sail. Some board and linker
-variants, generated-source relationships, component options and physical
-hardware remain unverified. Cargo firmware needs an explicit package name and
-a `[lib]` with `crate-type = ["staticlib"]`. Its supported `cargo_flags` are
-feature selection, `--locked`, `--offline` and `--frozen`; other Cargo options
-and workspace layouts need further work. These checks do not establish complete
-xmake or RTOS compatibility.
+For Sail, install `cheriot_sim` separately and make it available on `PATH`:
+
+```sh
+cheriot-compose run \
+  --file "$CHERIOT_RTOS/cheriot-compose.toml" \
+  --project tests --toolchain-dir "$CHERIOT_TOOLS/bin" \
+  --board sail --mode release --jobs 1
+```
+
+The usual test selection excludes optional cases such as Rust firmware and
+bigdata. Sail's runner checks for assertion failures in simulator output,
+including when the simulator itself returns success.
+
+For CHERIoT VM, install `cheriot-vm` separately. With its source checkout
+at `$HOME/cheriot-vm`, add the driver and Compose board overlays after the
+main RTOS integration from the Build section:
+
+```sh
+cp -a "$HOME/cheriot-vm/integrations/cheriot-rtos/." "$CHERIOT_RTOS/"
+cp -a "$CHERIOT_COMPOSE/integrations/cheriot-vm/." "$CHERIOT_RTOS/"
+
+cheriot-compose run \
+  --file "$CHERIOT_RTOS/cheriot-compose.toml" \
+  --project hello-world --toolchain-dir "$CHERIOT_TOOLS/bin" \
+  --board cheriot-vm --mode release --jobs 1 \
+  --vm-profile "$HOME/cheriot-vm/profiles/cheriot.toml"
+```
+
+The board determines firmware memory and device settings. The separate VM
+profile determines runtime settings; the two must describe compatible devices
+and timing. `--vm-profile` is an argument of `run`, not `build` or
+`check`. Additional runner arguments follow `--`.
+
+### Editor Support and Other Tools
+
+A plan can export `compile_commands.json` for editor tools. With the compiler
+installed, probe its supported options while generating the database:
+
+```sh
+cheriot-compose plan \
+  --file "$CHERIOT_RTOS/cheriot-compose.toml" \
+  --project hello-world --toolchain-dir "$CHERIOT_TOOLS/bin" \
+  --board sail --probe-toolchain --format compilation-database \
+  --output "$CHERIOT_RTOS/compile_commands.json"
+```
+
+The minimal compiler build does not install `clangd`. Install a compatible
+CHERIoT clangd if your editor needs to understand CHERIoT-specific options; an
+ordinary host clangd may reject them.
+
+The JSON plan and shell export describe the same underlying build actions.
+`compare-compilation-db` accepts `--against FILE` and repeatable
+`--map-path OLD=NEW` arguments to compare builds from different source
+locations. `--generated FILE` compares an existing database without selecting
+a project.
+
+`size` reports section sizes for firmware or a selected compartment.
+`package` requires a supported board packaging configuration and its tools;
+some workflows need an additional UF2 converter selected by
+`toolchain.uf2_converter`. `audit` needs an audit executable, query and any
+required modules. `analyze-switcher --input FILE` works with annotated
+assembly and does not require a project. Use command-specific help before
+these specialized workflows.
+
+### Rust Firmware and Verification
+
+Host Rust builds Compose itself. Firmware written in Rust needs a separate
+CHERIoT-capable compiler, selected through `toolchain.rust_compiler` in TOML
+or `RUSTC`. `toolchain.cargo` selects the host Cargo executable.
+
+Cargo firmware must specify a package name and a library with
+`crate-type = ["staticlib"]`. Supported Cargo flags cover feature selection,
+`--locked`, `--offline` and `--frozen`; other flags and workspace layouts
+need further work. The ordinary C/C++ hello-world and default RTOS test
+selection do not require a firmware Rust compiler.
+
+From the Compose checkout, run the host tests with:
+
+```sh
+cd "$CHERIOT_COMPOSE"
+cargo test --locked --all-targets
+cargo test --locked --all-targets --features host-tool-verification
+```
+
+Default tests use product-local fixtures and need neither an external RTOS
+checkout nor a CHERIoT compiler. The optional `host-tool-verification` tier
+uses a POSIX shell and standard utilities. `rtos-verification` includes
+those checks and additionally needs the RTOS sources, reference data and
+verification documentation used by that tier; a standalone checkout does not
+supply all those assets.
+
+These host tests check the build tool, separately from compiling and executing
+RTOS firmware. Recorded host verification used Rust 1.99.1 and the minimum
+Rust 1.89.0, and the RTOS test suite has been built and run on Sail. A fresh
+LLVM source build remains unverified for these instructions. Some boards,
+linker variants, generated-source relationships, component options and physical
+hardware remain unverified; the recorded checks do not establish complete
+RTOS compatibility.
+
+### Troubleshooting
+
+For a missing compiler, check that `--toolchain-dir` names the executable
+directory. For missing SDK inputs, check the project's `sdk` path and
+initialize the required RTOS submodules. If project or firmware selection is
+ambiguous, add `--project` or `--firmware`. Investigate unexpected rebuilds
+with `--verbose` and `explain`. For runner failures, confirm that the runner
+is installed and that the selected board and runtime profile agree.
 
 ## Licence
 
-The application is MIT licensed; see its local [LICENSE](LICENSE). SDK-derived
-templates retain their [SDK licence notice](templates/SDK-LICENSE).
+The application is MIT licensed; its licence text is in `LICENSE`.
+SDK-derived templates retain the notice in `templates/SDK-LICENSE`.
+

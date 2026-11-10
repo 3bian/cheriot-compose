@@ -257,10 +257,11 @@ fn test_selection_honors_opt_in_conflicts_and_plans_rust() {
     let fixture = TestFixture::new();
     let workspace = rtos_tree::RtosTree::new();
     let original = copy_test_project(&fixture, &workspace.root);
-    let bigdata = "include_in_most = false, name = \"bigdata\", target = \"bigdata_test\"";
+    let bigdata = "name = \"bigdata\"";
+    assert!(original.contains(bigdata));
     let selected = original
         .replace("most_tests = true", "most_tests = false")
-        .replace(bigdata, &format!("enabled = true, {bigdata}"));
+        .replace(bigdata, &format!("{bigdata}\nenabled = true"));
     fixture.write_file("cheriot-compose.toml", &selected);
     let project = cheriot_compose::project::load_project(&fixture.project_file()).unwrap();
     let suite = project.test_suite.as_ref().unwrap();
@@ -289,7 +290,7 @@ fn test_selection_honors_opt_in_conflicts_and_plans_rust() {
 
     fixture.write_file(
         "cheriot-compose.toml",
-        &original.replace(bigdata, &format!("enabled = true, {bigdata}")),
+        &original.replace(bigdata, &format!("{bigdata}\nenabled = true")),
     );
     assert!(
         cheriot_compose::project::load_project(&fixture.project_file())
@@ -297,10 +298,11 @@ fn test_selection_honors_opt_in_conflicts_and_plans_rust() {
             .to_string()
             .contains("conflicts with test allocator")
     );
-    let rust = "firmware_rust_source = \"rust-test.rs\", include_in_most = false, name = \"rust\", target = \"rust_test\"";
+    let rust = "name = \"rust\"";
+    assert!(original.contains(rust));
     fixture.write_file(
         "cheriot-compose.toml",
-        &original.replace(rust, &format!("enabled = true, {rust}")),
+        &original.replace(rust, &format!("{rust}\nenabled = true")),
     );
     let project = cheriot_compose::project::load_project(&fixture.project_file()).unwrap();
     let plan = planning::create_build_plan(&project).unwrap();
@@ -353,10 +355,10 @@ fn test_selection_honors_opt_in_conflicts_and_plans_rust() {
 fn selected_tests_receive_float_options_and_dependencies() {
     let fixture = TestFixture::new();
     let workspace = rtos_tree::RtosTree::new();
-    let mmio = "name = \"mmio\", target = \"mmio_test\"";
+    let mmio = "name = \"mmio\"";
     let document = copy_test_project(&fixture, &workspace.root)
         .replace("most_tests = true", "most_tests = false")
-        .replace(mmio, &format!("enabled = true, {mmio}"))
+        .replace(mmio, &format!("{mmio}\nenabled = true"))
         .replace(
             "[services.test_runner]",
             "[options]\nprint_doubles = true\nprint_floats = true\n\n[services.test_runner]",

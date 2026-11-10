@@ -1,6 +1,7 @@
 # Copyright 3Bian Limited and Contributors.
 # SPDX-License-Identifier: MIT
-# Derived from cheriot-vm's CHERIoT RTOS board definition at cbc983f6e04c25b727254cb5d0371fdfc75c746d.
+# Derived from cheriot-vm's CHERIoT RTOS board definition at
+# cbc983f6e04c25b727254cb5d0371fdfc75c746d.
 
 name = "cheriot-vm"
 cpu = "cheriot"

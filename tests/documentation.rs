@@ -11,12 +11,25 @@ use std::process::Command;
 mod rtos_tree;
 
 #[test]
-fn product_readme_commands_put_the_toolchain_directory_first() {
-    check_document_commands(
-        Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("README.md")
-            .as_path(),
-    );
+fn product_readme_build_examples_specify_the_toolchain_directory() {
+    let readme = std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md"))
+        .unwrap()
+        .replace("\\\n", " ");
+    for line in readme.lines() {
+        for occurrence in line.match_indices("cheriot-compose ") {
+            let words: Vec<_> = line[occurrence.0..].split_whitespace().collect();
+            if matches!(words.get(1), Some(&"build" | &"run"))
+                && !words.contains(&"--help")
+                && !words.contains(&"-h")
+            {
+                let index = words
+                    .iter()
+                    .position(|word| *word == "--toolchain-dir")
+                    .unwrap_or_else(|| panic!("missing toolchain directory: {line}"));
+                assert!(words.get(index + 1).is_some(), "{line}");
+            }
+        }
+    }
 }
 
 #[test]
@@ -35,6 +48,7 @@ fn repository_document_commands_put_the_toolchain_directory_first() {
     }
 }
 
+#[cfg(feature = "rtos-verification")]
 fn check_document_commands(document: &Path) {
     let project_commands = [
         "check",
@@ -47,7 +61,7 @@ fn check_document_commands(document: &Path) {
         "audit",
         "package",
         "size",
-        "compare-compilation-database",
+        "compare-compilation-db",
     ];
     let text = std::fs::read_to_string(document)
         .unwrap()
@@ -75,24 +89,20 @@ fn common_readme_commands_match_the_workspace_and_cli() {
     let readme =
         std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md")).unwrap();
     let common = readme
-        .split("### Command-Line Options\n")
+        .split("### Common Commands\n")
         .nth(1)
         .unwrap()
         .split("\n## ")
         .next()
         .unwrap()
-        .split("#### Common Commands\n")
-        .nth(1)
-        .unwrap()
-        .split("\n#### ")
-        .next()
-        .unwrap();
+        .replace("\\\n", " ");
     let mut count = 0;
     for line in common
         .lines()
         .filter(|line| line.starts_with("cheriot-compose "))
     {
-        let mut args: Vec<_> = line.split_whitespace().skip(1).collect();
+        let runnable = line.replace("\"$CHERIOT_TOOLS/bin\"", "/cheriot-tools/bin");
+        let mut args: Vec<_> = runnable.split_whitespace().skip(1).collect();
         if matches!(args.first(), Some(&"build" | &"run")) {
             args.push("--dry-run");
         }
@@ -108,7 +118,7 @@ fn common_readme_commands_match_the_workspace_and_cli() {
         );
         count += 1;
     }
-    assert_eq!(count, 5);
+    assert_eq!(count, 4);
 }
 
 #[test]
@@ -120,7 +130,7 @@ fn readme_project_configuration_is_valid_in_an_rtos_checkout() {
     let readme =
         std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md")).unwrap();
     let project = readme
-        .split("## Project Configuration\n")
+        .split("### TOML Projects and Firmware\n")
         .nth(1)
         .unwrap()
         .split("```toml\n")
@@ -144,27 +154,21 @@ fn readme_project_configuration_is_valid_in_an_rtos_checkout() {
 }
 
 #[test]
-fn command_reference_in_readme_covers_the_commands_shown_in_help() {
+fn general_help_in_the_readme_matches_the_executable() {
     let readme =
         std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("README.md")).unwrap();
     let help = std::process::Command::new(env!("CARGO_BIN_EXE_cheriot-compose"))
-        .arg("help")
+        .arg("--help")
         .output()
         .unwrap();
     assert!(help.status.success());
     let help = String::from_utf8(help.stdout).unwrap();
-    let commands = help
-        .split("Commands:\n")
+    let documented = readme
+        .split("```text\n")
         .nth(1)
         .unwrap()
-        .split("Common options:")
+        .split("\n```")
         .next()
         .unwrap();
-    for line in commands.lines().filter(|line| line.starts_with("  ")) {
-        let name = line.split_whitespace().next().unwrap();
-        assert!(
-            readme.contains(&format!("`{name}`")),
-            "README missing command {name}"
-        );
-    }
+    assert_eq!(documented, help.trim_end());
 }

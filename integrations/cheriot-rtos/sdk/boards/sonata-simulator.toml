@@ -3,7 +3,12 @@
 
 name = "sonata-simulator"
 extends = "sonata-1.1.toml"
-patches = [
-    { op = "replace", path = "/simulation", value = true },
-    { op = "replace", path = "/runner", value = { executable = "${sdk}/scripts/run-sonata-sim.sh" } },
-]
+[[patches]]
+op = "replace"
+path = "/simulation"
+value = true
+
+[[patches]]
+op = "replace"
+path = "/runner"
+value = { executable = "${sdk}/scripts/run-sonata-sim.sh" }
